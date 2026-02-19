@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+venv/
+.env
+
+# Data files (user-generated)
+data/inventory.json
+data/price_cache.json
+data/trade_history.json
+
+# IDE
+.vscode/
+.idea/

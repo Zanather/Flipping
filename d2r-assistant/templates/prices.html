@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}D2R Assistant - Price Guide{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Price Guide -->
+    <div class="col-lg-8">
+        <div class="d2r-card">
+            <div class="d2r-card-header d-flex justify-content-between">
+                <span><i class="bi bi-currency-exchange"></i> Price Guide</span>
+                <div>
+                    <input type="text" class="form-control form-control-sm d-inline-block" style="width:200px"
+                           id="priceFilter" placeholder="Filter items..." oninput="filterPrices()">
+                    <select class="form-select form-select-sm d-inline-block" style="width:120px"
+                            id="categoryFilter" onchange="filterPrices()">
+                        <option value="">All</option>
+                        <option value="rune">Runes</option>
+                        <option value="runeword">Runewords</option>
+                        <option value="unique">Uniques</option>
+                        <option value="base">Bases</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-dark table-sm table-hover" id="priceTable">
+                    <thead>
+                        <tr>
+                            <th style="cursor:pointer" onclick="sortTable(0)">Item <i class="bi bi-arrow-down-up"></i></th>
+                            <th>Category</th>
+                            <th>Tier</th>
+                            <th style="cursor:pointer" onclick="sortTable(3)">FG Low <i class="bi bi-arrow-down-up"></i></th>
+                            <th style="cursor:pointer" onclick="sortTable(4)">FG High <i class="bi bi-arrow-down-up"></i></th>
+                            <th>FG Mid</th>
+                            <th>HR Equiv</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for name, data in prices.items() %}
+                        <tr data-category="{{ data.category }}" data-name="{{ name|lower }}">
+                            <td class="quality-unique">{{ name }}</td>
+                            <td><span class="badge bg-secondary">{{ data.category }}</span></td>
+                            <td>
+                                {% if data.tier %}
+                                <span class="tier-badge tier-{{ data.tier|lower }}">{{ data.tier }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="price-fg">{{ data.fg_low }}</td>
+                            <td class="price-fg">{{ data.fg_high }}</td>
+                            <td class="price-fg">{{ data.fg_mid }}</td>
+                            <td class="price-hr">{{ data.hr_equivalent }}</td>
+                            <td class="text-muted small">{{ data.get('note', '') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- HR Rates -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-gem"></i> Rune Values (FG)</div>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-dark table-sm">
+                    <thead><tr><th>Rune</th><th>FG Value</th></tr></thead>
+                    <tbody>
+                        {% for rune, fg in hr_rates.items() %}
+                        <tr>
+                            <td class="quality-runeword">{{ rune }}</td>
+                            <td class="price-fg">{{ fg }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Converter -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-arrow-left-right"></i> Currency Converter</div>
+
+            <div class="mb-3">
+                <label class="form-label small">FG to HR</label>
+                <div class="input-group input-group-sm">
+                    <input type="number" class="form-control" id="fgToHrInput" placeholder="FG amount">
+                    <button class="btn btn-outline-warning" onclick="convertFg()">Convert</button>
+                </div>
+                <div id="fgToHrResult" class="price-hr mt-1"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small">HR to FG</label>
+                <div class="input-group input-group-sm">
+                    <select class="form-select" id="hrToFgRune">
+                        {% for rune in hr_rates %}
+                        <option value="{{ rune }}">{{ rune }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" class="form-control" id="hrToFgQty" value="1" min="1">
+                    <button class="btn btn-outline-warning" onclick="convertHr()">Convert</button>
+                </div>
+                <div id="hrToFgResult" class="price-fg mt-1"></div>
+            </div>
+        </div>
+
+        <!-- Quick Price Check -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-tag"></i> Quick Price Check</div>
+            <div class="input-group input-group-sm mb-2">
+                <input type="text" class="form-control" id="quickPriceInput" placeholder="Item name">
+                <button class="btn btn-outline-warning" onclick="quickPrice()">Check</button>
+            </div>
+            <div id="quickPriceResult"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterPrices() {
+    const text = document.getElementById('priceFilter').value.toLowerCase();
+    const category = document.getElementById('categoryFilter').value;
+    const rows = document.querySelectorAll('#priceTable tbody tr');
+
+    rows.forEach(row => {
+        const name = row.dataset.name;
+        const cat = row.dataset.category;
+        const matchText = !text || name.includes(text);
+        const matchCat = !category || cat === category;
+        row.style.display = (matchText && matchCat) ? '' : 'none';
+    });
+}
+
+function sortTable(colIndex) {
+    const table = document.getElementById('priceTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    const isNumeric = colIndex >= 3 && colIndex <= 5;
+    const ascending = table.dataset.sortCol == colIndex && table.dataset.sortDir === 'asc';
+
+    rows.sort((a, b) => {
+        let aVal = a.cells[colIndex].textContent.trim();
+        let bVal = b.cells[colIndex].textContent.trim();
+        if (isNumeric) {
+            aVal = parseFloat(aVal) || 0;
+            bVal = parseFloat(bVal) || 0;
+            return ascending ? bVal - aVal : aVal - bVal;
+        }
+        return ascending ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
+    });
+
+    table.dataset.sortCol = colIndex;
+    table.dataset.sortDir = ascending ? 'desc' : 'asc';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+async function convertFg() {
+    const fg = document.getElementById('fgToHrInput').value;
+    if (!fg) return;
+    const res = await fetch(`/api/convert/fg-to-hr?fg=${fg}`);
+    const data = await res.json();
+    document.getElementById('fgToHrResult').textContent = data.hr;
+}
+
+async function convertHr() {
+    const rune = document.getElementById('hrToFgRune').value;
+    const qty = document.getElementById('hrToFgQty').value;
+    const res = await fetch(`/api/convert/hr-to-fg?rune=${rune}&qty=${qty}`);
+    const data = await res.json();
+    document.getElementById('hrToFgResult').textContent = `${data.fg_total} FG`;
+}
+
+async function quickPrice() {
+    const name = document.getElementById('quickPriceInput').value;
+    if (!name) return;
+    const res = await fetch(`/api/price/${encodeURIComponent(name)}`);
+    const data = await res.json();
+    const container = document.getElementById('quickPriceResult');
+
+    if (data.fg_estimated) {
+        container.innerHTML = `
+            <div class="price-fg">${data.fg_estimated} FG</div>
+            <div class="price-range">${data.fg_low} - ${data.fg_high} FG</div>
+            <div class="price-hr">${data.hr_equivalent}</div>
+            ${data.note ? `<div class="text-muted small">${data.note}</div>` : ''}
+        `;
+    } else {
+        container.innerHTML = '<div class="text-muted">Not found in price guide.</div>';
+    }
+}
+</script>
+{% endblock %}

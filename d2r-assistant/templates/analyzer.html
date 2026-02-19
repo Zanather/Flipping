@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+{% block title %}D2R Assistant - Item Analyzer{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-search"></i> Item Analyzer</div>
+            <p class="text-muted small">Enter an item's stats to see roll quality, value ranges, and pricing.</p>
+
+            <div class="item-form">
+                <div class="mb-3">
+                    <label class="form-label">Item Name</label>
+                    <input type="text" class="form-control" id="analyzeItemName"
+                           placeholder="e.g. Griffon's Eye, Enigma, Call to Arms"
+                           list="itemSuggestions">
+                    <datalist id="itemSuggestions"></datalist>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" id="analyzeItemType">
+                            <option value="unique">Unique</option>
+                            <option value="runeword">Runeword</option>
+                            <option value="set">Set</option>
+                            <option value="rare">Rare</option>
+                            <option value="magic">Magic</option>
+                            <option value="base">Base</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Sockets</label>
+                        <input type="number" class="form-control" id="analyzeItemSockets" value="0" min="0" max="6">
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="analyzeItemEth">
+                    <label class="form-check-label">Ethereal</label>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label d-flex justify-content-between">
+                        <span>Modifiers</span>
+                        <button class="btn btn-sm btn-outline-info" onclick="addAnalyzeMod()">+ Add Mod</button>
+                    </label>
+                    <div id="analyzeModInputs"></div>
+                    <button class="btn btn-sm btn-outline-secondary mt-2" onclick="loadKnownMods()">
+                        <i class="bi bi-magic"></i> Auto-fill mods from database
+                    </button>
+                </div>
+
+                <button class="btn btn-warning w-100" onclick="analyzeItem()">
+                    <i class="bi bi-search"></i> Analyze Item
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Lookup -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-lightning"></i> Quick Lookup</div>
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" id="quickLookup" placeholder="Search runewords, uniques, bases...">
+                <button class="btn btn-outline-warning" onclick="quickLookup()">Search</button>
+            </div>
+            <div id="quickResults"></div>
+        </div>
+    </div>
+
+    <!-- Analysis Results -->
+    <div class="col-lg-6">
+        <div class="d2r-card" id="analysisResults" style="display:none;">
+            <div class="d2r-card-header d-flex justify-content-between">
+                <span><i class="bi bi-clipboard-data"></i> Analysis Results</span>
+                <span id="overallQualityBadge"></span>
+            </div>
+
+            <div id="itemHeader" class="mb-3"></div>
+
+            <!-- Mod Analysis -->
+            <div id="modAnalysis" class="mb-3"></div>
+
+            <!-- Price Info -->
+            <div id="priceInfo" class="mb-3"></div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-success" onclick="generateTradePitch()">
+                    <i class="bi bi-megaphone"></i> Sales Pitch
+                </button>
+                <button class="btn btn-sm btn-outline-info" onclick="sendToTrade()">
+                    <i class="bi bi-shop"></i> Create Trade Post
+                </button>
+            </div>
+        </div>
+
+        <!-- Runeword Browser -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-gem"></i> Runeword Browser</div>
+            <div class="row g-2" id="runewordBrowser">
+                <div class="text-center text-muted py-2">
+                    <small>Loading runewords...</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Pitch Modal -->
+<div class="modal fade" id="pitchModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Sales Pitch</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="trade-preview" id="pitchContent"></div>
+                <button class="btn btn-sm btn-outline-success mt-2 btn-copy" onclick="copyPitch()">
+                    <i class="bi bi-clipboard"></i> Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentAnalysis = null;
+let currentPrice = null;
+let modCounter = 0;
+
+function addAnalyzeMod(name, value) {
+    const id = modCounter++;
+    const container = document.getElementById('analyzeModInputs');
+    const row = document.createElement('div');
+    row.className = 'mod-input-row';
+    row.id = `amod-${id}`;
+    row.innerHTML = `
+        <input type="text" class="form-control form-control-sm" placeholder="Mod name (e.g. +All Resistances)" value="${name || ''}">
+        <input type="number" class="form-control form-control-sm" style="max-width:80px" placeholder="Value" value="${value || ''}">
+        <button class="btn btn-sm btn-outline-danger btn-remove" onclick="document.getElementById('amod-${id}').remove()">x</button>
+    `;
+    container.appendChild(row);
+}
+
+function getAnalyzeMods() {
+    const mods = {};
+    const container = document.getElementById('analyzeModInputs');
+    for (const row of container.children) {
+        const inputs = row.querySelectorAll('input');
+        if (inputs[0].value && inputs[1].value) {
+            mods[inputs[0].value] = parseFloat(inputs[1].value);
+        }
+    }
+    return mods;
+}
+
+async function analyzeItem() {
+    const item = {
+        name: document.getElementById('analyzeItemName').value,
+        type: document.getElementById('analyzeItemType').value,
+        ethereal: document.getElementById('analyzeItemEth').checked,
+        sockets: parseInt(document.getElementById('analyzeItemSockets').value),
+        mods: getAnalyzeMods(),
+    };
+
+    if (!item.name) {
+        showToast('Enter an item name', 'warning');
+        return;
+    }
+
+    // Analyze and price in parallel
+    const [analysisRes, priceRes] = await Promise.all([
+        fetch('/api/analyze', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(item)
+        }),
+        fetch(`/api/price/${encodeURIComponent(item.name)}`)
+    ]);
+
+    currentAnalysis = await analysisRes.json();
+    currentPrice = await priceRes.json();
+
+    displayAnalysis(currentAnalysis, currentPrice);
+}
+
+function displayAnalysis(analysis, price) {
+    const container = document.getElementById('analysisResults');
+    container.style.display = 'block';
+
+    // Header
+    const header = document.getElementById('itemHeader');
+    const ethTag = analysis.ethereal ? '<span class="quality-eth">ETH</span> ' : '';
+    const tierBadge = analysis.tier ? `<span class="tier-badge tier-${analysis.tier.toLowerCase()}">${analysis.tier}</span>` : '';
+
+    header.innerHTML = `
+        <h5>${ethTag}<span class="quality-unique">${analysis.name}</span> ${tierBadge}</h5>
+        <div class="text-muted small">Type: ${analysis.type}</div>
+    `;
+
+    // Overall quality
+    const badge = document.getElementById('overallQualityBadge');
+    if (analysis.overall_quality_pct != null) {
+        const color = getQualityColor(analysis.overall_quality_pct);
+        badge.innerHTML = `<span style="color:${color}; font-weight:bold;">${analysis.overall_quality_pct}% (${analysis.overall_quality})</span>`;
+    } else {
+        badge.innerHTML = `<span class="text-muted">${analysis.overall_quality}</span>`;
+    }
+
+    // Mod analysis
+    const modDiv = document.getElementById('modAnalysis');
+    if (analysis.mod_analysis && analysis.mod_analysis.length > 0) {
+        let html = '<h6 class="text-muted">Modifier Analysis</h6>';
+        for (const mod of analysis.mod_analysis) {
+            html += renderModRow(mod);
+        }
+        modDiv.innerHTML = html;
+    } else {
+        modDiv.innerHTML = '<p class="text-muted">No modifier data available for this item.</p>';
+    }
+
+    // Price info
+    const priceDiv = document.getElementById('priceInfo');
+    if (price && price.fg_estimated) {
+        priceDiv.innerHTML = `
+            <h6 class="text-muted">Pricing</h6>
+            <div class="d-flex justify-content-between">
+                <span>Estimated Value:</span>
+                <span class="price-fg">${price.fg_estimated} FG</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Range:</span>
+                <span class="price-range">${price.fg_low} - ${price.fg_high} FG</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>HR Equivalent:</span>
+                <span class="price-hr">${price.hr_equivalent}</span>
+            </div>
+            ${price.note ? `<div class="text-muted small mt-1"><i class="bi bi-info-circle"></i> ${price.note}</div>` : ''}
+        `;
+    } else {
+        priceDiv.innerHTML = '<p class="text-muted small">No pricing data available. Check D2JSP or Traderie.</p>';
+    }
+}
+
+function renderModRow(mod) {
+    let qualityHtml = '';
+    if (mod.variable && mod.quality_pct != null) {
+        const color = getQualityColor(mod.quality_pct);
+        const barClass = getBarClass(mod.quality_pct);
+        qualityHtml = `
+            <div class="mod-quality" style="color:${color}">${mod.quality_pct}%</div>
+            <div style="width:80px">
+                <div class="roll-bar">
+                    <div class="roll-bar-fill ${barClass}" style="width:${mod.quality_pct}%"></div>
+                </div>
+            </div>
+        `;
+    } else if (!mod.variable) {
+        qualityHtml = '<div class="mod-quality text-muted">fixed</div><div style="width:80px"></div>';
+    } else {
+        qualityHtml = `<div class="mod-quality text-muted">${mod.quality_label || '-'}</div><div style="width:80px"></div>`;
+    }
+
+    const rangeStr = (mod.min != null && mod.max != null) ? `[${mod.min}-${mod.max}]` : '';
+    const actualStr = mod.actual != null ? mod.actual : '-';
+
+    return `
+        <div class="mod-row">
+            <div class="mod-name">${mod.name}</div>
+            <div class="mod-value">${actualStr}</div>
+            <div class="mod-range">${rangeStr}</div>
+            ${qualityHtml}
+        </div>
+    `;
+}
+
+function getQualityColor(pct) {
+    if (pct >= 95) return '#FFD700';
+    if (pct >= 80) return '#00FF00';
+    if (pct >= 60) return '#90EE90';
+    if (pct >= 40) return '#FFFF00';
+    if (pct >= 20) return '#FFA500';
+    return '#FF4444';
+}
+
+function getBarClass(pct) {
+    if (pct >= 95) return 'roll-perfect';
+    if (pct >= 80) return 'roll-high';
+    if (pct >= 60) return 'roll-above';
+    if (pct >= 40) return 'roll-avg';
+    if (pct >= 20) return 'roll-below';
+    return 'roll-low';
+}
+
+async function loadKnownMods() {
+    const name = document.getElementById('analyzeItemName').value;
+    if (!name) {
+        showToast('Enter an item name first', 'warning');
+        return;
+    }
+
+    const res = await fetch('/api/search?q=' + encodeURIComponent(name));
+    const data = await res.json();
+
+    const match = data.database_matches && data.database_matches[0];
+    if (match && match.data && match.data.mods) {
+        document.getElementById('analyzeModInputs').innerHTML = '';
+        for (const [modName, modInfo] of Object.entries(match.data.mods)) {
+            addAnalyzeMod(modName, '');
+        }
+        showToast(`Loaded ${Object.keys(match.data.mods).length} mods. Fill in your values.`, 'info');
+    } else {
+        showToast('Item not found in database.', 'warning');
+    }
+}
+
+async function quickLookup() {
+    const query = document.getElementById('quickLookup').value;
+    if (!query) return;
+
+    const res = await fetch('/api/search?q=' + encodeURIComponent(query));
+    const data = await res.json();
+
+    const container = document.getElementById('quickResults');
+    const results = data.database_matches || [];
+
+    if (results.length === 0) {
+        container.innerHTML = '<div class="text-muted small">No results found.</div>';
+        return;
+    }
+
+    container.innerHTML = results.slice(0, 10).map(r => `
+        <div class="inventory-item mb-2" onclick="document.getElementById('analyzeItemName').value='${r.name}'">
+            <div class="d-flex justify-content-between">
+                <strong class="quality-unique">${r.name}</strong>
+                <small class="text-muted">${r.category}</small>
+            </div>
+            ${r.data.tier ? `<span class="tier-badge tier-${r.data.tier.toLowerCase()}">${r.data.tier}</span>` : ''}
+            ${r.data.est_fg ? `<span class="price-range ms-2">${r.data.est_fg} FG</span>` : ''}
+        </div>
+    `).join('');
+}
+
+async function generateTradePitch() {
+    if (!currentAnalysis) return;
+    const item = {
+        name: document.getElementById('analyzeItemName').value,
+        type: document.getElementById('analyzeItemType').value,
+        mods: getAnalyzeMods(),
+        ethereal: document.getElementById('analyzeItemEth').checked,
+        overall_quality_pct: currentAnalysis.overall_quality_pct,
+        overall_quality: currentAnalysis.overall_quality,
+    };
+
+    const res = await fetch('/api/trade/pitch', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({item})
+    });
+    const data = await res.json();
+
+    document.getElementById('pitchContent').textContent = data.pitch;
+    new bootstrap.Modal(document.getElementById('pitchModal')).show();
+}
+
+function copyPitch() {
+    const text = document.getElementById('pitchContent').textContent;
+    navigator.clipboard.writeText(text);
+    showToast('Copied to clipboard!', 'success');
+}
+
+function sendToTrade() {
+    const name = document.getElementById('analyzeItemName').value;
+    window.location.href = `/trade?item=${encodeURIComponent(name)}`;
+}
+
+// Load runeword browser
+async function loadRunewords() {
+    const res = await fetch('/api/runewords');
+    const data = await res.json();
+    const container = document.getElementById('runewordBrowser');
+
+    container.innerHTML = Object.entries(data).map(([name, rw]) => `
+        <div class="col-md-6">
+            <div class="inventory-item" onclick="document.getElementById('analyzeItemName').value='${name}'; document.getElementById('analyzeItemType').value='runeword';">
+                <div class="d-flex justify-content-between">
+                    <strong class="quality-runeword">${name}</strong>
+                    ${rw.tier ? `<span class="tier-badge tier-${rw.tier.toLowerCase()}">${rw.tier}</span>` : ''}
+                </div>
+                <div class="small text-muted">${rw.runes.join(' + ')}</div>
+                <div class="small text-muted">${rw.bases.join(', ')}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Check URL params for pre-fill
+document.addEventListener('DOMContentLoaded', () => {
+    loadRunewords();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('item')) {
+        document.getElementById('analyzeItemName').value = params.get('item');
+    }
+});
+</script>
+{% endblock %}

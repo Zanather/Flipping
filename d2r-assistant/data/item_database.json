@@ -1,0 +1,545 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "game": "Diablo II: Resurrected",
+    "last_updated": "2026-02-19",
+    "description": "Comprehensive D2R item database with modifier ranges and base values"
+  },
+  "runes": {
+    "El": {"level": 11, "number": 1, "weapon_mod": "+50 Attack Rating, +1 Light Radius", "armor_mod": "+15 Defense, +1 Light Radius"},
+    "Eld": {"level": 11, "number": 2, "weapon_mod": "+75% Damage vs Undead, +50 AR vs Undead", "armor_mod": "15% Slower Stamina Drain"},
+    "Tir": {"level": 13, "number": 3, "weapon_mod": "+2 Mana After Each Kill", "armor_mod": "+2 Mana After Each Kill"},
+    "Nef": {"level": 13, "number": 4, "weapon_mod": "Knockback", "armor_mod": "+30 Defense vs Missile"},
+    "Eth": {"level": 15, "number": 5, "weapon_mod": "-25% Target Defense", "armor_mod": "Regenerate Mana 15%"},
+    "Ith": {"level": 15, "number": 6, "weapon_mod": "+9 to Maximum Damage", "armor_mod": "15% Damage Taken Goes to Mana"},
+    "Tal": {"level": 17, "number": 7, "weapon_mod": "+75 Poison Damage over 5 sec", "armor_mod": "Poison Resist +30%"},
+    "Ral": {"level": 19, "number": 8, "weapon_mod": "+5-30 Fire Damage", "armor_mod": "Fire Resist +30%"},
+    "Ort": {"level": 21, "number": 9, "weapon_mod": "+1-50 Lightning Damage", "armor_mod": "Lightning Resist +30%"},
+    "Thul": {"level": 23, "number": 10, "weapon_mod": "+3-14 Cold Damage (3 sec)", "armor_mod": "Cold Resist +30%"},
+    "Amn": {"level": 25, "number": 11, "weapon_mod": "7% Life Stolen Per Hit", "armor_mod": "Attacker Takes 14 Damage"},
+    "Sol": {"level": 27, "number": 12, "weapon_mod": "+9 to Minimum Damage", "armor_mod": "Damage Reduced By 7"},
+    "Shael": {"level": 29, "number": 13, "weapon_mod": "20% Increased Attack Speed", "armor_mod": "20% Faster Hit Recovery"},
+    "Dol": {"level": 31, "number": 14, "weapon_mod": "Hit Causes Monster to Flee 25%", "armor_mod": "Replenish Life +7"},
+    "Hel": {"level": 0, "number": 15, "weapon_mod": "Requirements -20%", "armor_mod": "Requirements -15%"},
+    "Io": {"level": 35, "number": 16, "weapon_mod": "+10 to Vitality", "armor_mod": "+10 to Vitality"},
+    "Lum": {"level": 37, "number": 17, "weapon_mod": "+10 to Energy", "armor_mod": "+10 to Energy"},
+    "Ko": {"level": 39, "number": 18, "weapon_mod": "+10 to Dexterity", "armor_mod": "+10 to Dexterity"},
+    "Fal": {"level": 41, "number": 19, "weapon_mod": "+10 to Strength", "armor_mod": "+10 to Strength"},
+    "Lem": {"level": 43, "number": 20, "weapon_mod": "75% Extra Gold from Monsters", "armor_mod": "50% Extra Gold from Monsters"},
+    "Pul": {"level": 45, "number": 21, "weapon_mod": "+75% Damage vs Demons, +100 AR vs Demons", "armor_mod": "+30% Enhanced Defense"},
+    "Um": {"level": 47, "number": 22, "weapon_mod": "25% Chance of Open Wounds", "armor_mod": "All Resistances +15"},
+    "Mal": {"level": 49, "number": 23, "weapon_mod": "Prevent Monster Heal", "armor_mod": "Magic Damage Reduced By 7"},
+    "Ist": {"level": 51, "number": 24, "weapon_mod": "30% Better Chance of Getting Magic Items", "armor_mod": "25% Better Chance of Getting Magic Items"},
+    "Gul": {"level": 53, "number": 25, "weapon_mod": "20% Bonus to Attack Rating", "armor_mod": "5% to Maximum Poison Resist"},
+    "Vex": {"level": 55, "number": 26, "weapon_mod": "7% Mana Stolen Per Hit", "armor_mod": "5% to Maximum Fire Resist"},
+    "Ohm": {"level": 57, "number": 27, "weapon_mod": "+50% Enhanced Damage", "armor_mod": "5% to Maximum Cold Resist"},
+    "Lo": {"level": 59, "number": 28, "weapon_mod": "20% Deadly Strike", "armor_mod": "5% to Maximum Lightning Resist"},
+    "Sur": {"level": 61, "number": 29, "weapon_mod": "Hit Blinds Target", "armor_mod": "Maximum Mana +5%"},
+    "Ber": {"level": 63, "number": 30, "weapon_mod": "20% Chance of Crushing Blow", "armor_mod": "Damage Reduced by 8%"},
+    "Jah": {"level": 65, "number": 31, "weapon_mod": "Ignore Target's Defense", "armor_mod": "Increase Maximum Life 5%"},
+    "Cham": {"level": 67, "number": 32, "weapon_mod": "Freeze Target +3", "armor_mod": "Cannot Be Frozen"},
+    "Zod": {"level": 69, "number": 33, "weapon_mod": "Indestructible", "armor_mod": "Indestructible"}
+  },
+  "runewords": {
+    "Enigma": {
+      "runes": ["Jah", "Ith", "Ber"],
+      "bases": ["3 Socket Body Armor"],
+      "level_req": 65,
+      "mods": {
+        "+2 To All Skills": {"min": 2, "max": 2, "variable": false},
+        "+45% Faster Run/Walk": {"min": 45, "max": 45, "variable": false},
+        "+1 To Teleport": {"min": 1, "max": 1, "variable": false},
+        "+750-775 Defense": {"min": 750, "max": 775, "variable": true},
+        "+Strength (0.75 per clvl)": {"min": 0, "max": 74, "variable": true, "per_level": true},
+        "Increase Maximum Life 5%": {"min": 5, "max": 5, "variable": false},
+        "Damage Reduced By 8%": {"min": 8, "max": 8, "variable": false},
+        "+14 Life After Each Kill": {"min": 14, "max": 14, "variable": false},
+        "15% Damage Taken Goes to Mana": {"min": 15, "max": 15, "variable": false},
+        "+1% Better Chance of Getting Magic Items (per clvl)": {"min": 1, "max": 99, "variable": true, "per_level": true}
+      },
+      "tier": "S",
+      "popular_bases": ["Mage Plate", "Dusk Shroud", "Archon Plate"]
+    },
+    "Infinity": {
+      "runes": ["Ber", "Mal", "Ber", "Ist"],
+      "bases": ["4 Socket Polearm"],
+      "level_req": 63,
+      "mods": {
+        "50% Chance To Cast Level 20 Chain Lightning When You Kill An Enemy": {"min": 50, "max": 50, "variable": false},
+        "Level 12 Conviction Aura When Equipped": {"min": 12, "max": 12, "variable": false},
+        "+35% Faster Run/Walk": {"min": 35, "max": 35, "variable": false},
+        "+255-325% Enhanced Damage": {"min": 255, "max": 325, "variable": true},
+        "-(45-55)% To Enemy Lightning Resistance": {"min": 45, "max": 55, "variable": true},
+        "40% Chance of Crushing Blow": {"min": 40, "max": 40, "variable": false},
+        "Prevent Monster Heal": {"min": 1, "max": 1, "variable": false},
+        "+0.5 Vitality (per clvl)": {"min": 0, "max": 49, "variable": true, "per_level": true},
+        "30% Better Chance of Getting Magic Items": {"min": 30, "max": 30, "variable": false},
+        "Level 21 Cyclone Armor (30 Charges)": {"min": 21, "max": 21, "variable": false}
+      },
+      "tier": "S",
+      "popular_bases": ["Thresher", "Giant Thresher", "Colossus Voulge", "Cryptic Axe"]
+    },
+    "Grief": {
+      "runes": ["Eth", "Tir", "Lo", "Mal", "Ral"],
+      "bases": ["5 Socket Sword", "5 Socket Axe"],
+      "level_req": 59,
+      "mods": {
+        "35% Chance To Cast Level 15 Venom On Striking": {"min": 35, "max": 35, "variable": false},
+        "+30-40% Increased Attack Speed": {"min": 30, "max": 40, "variable": true},
+        "Damage +340-400": {"min": 340, "max": 400, "variable": true},
+        "Ignore Target's Defense": {"min": 1, "max": 1, "variable": false},
+        "-25% Target Defense": {"min": 25, "max": 25, "variable": false},
+        "+(1.875 per clvl)% Damage to Demons": {"min": 1, "max": 185, "variable": true, "per_level": true},
+        "Adds 5-30 Fire Damage": {"min": 5, "max": 30, "variable": false},
+        "-20-25% To Enemy Poison Resistance": {"min": 20, "max": 25, "variable": true},
+        "20% Deadly Strike": {"min": 20, "max": 20, "variable": false},
+        "Prevent Monster Heal": {"min": 1, "max": 1, "variable": false},
+        "+2 Mana After Each Kill": {"min": 2, "max": 2, "variable": false},
+        "+10-15 Life After Each Kill": {"min": 10, "max": 15, "variable": true}
+      },
+      "tier": "S",
+      "popular_bases": ["Phase Blade", "Berserker Axe"]
+    },
+    "Heart of the Oak": {
+      "runes": ["Ko", "Vex", "Pul", "Thul"],
+      "bases": ["4 Socket Mace", "4 Socket Staff"],
+      "level_req": 55,
+      "mods": {
+        "+3 To All Skills": {"min": 3, "max": 3, "variable": false},
+        "+40% Faster Cast Rate": {"min": 40, "max": 40, "variable": false},
+        "+75% Damage to Demons": {"min": 75, "max": 75, "variable": false},
+        "+100 to Attack Rating Against Demons": {"min": 100, "max": 100, "variable": false},
+        "Adds 3-14 Cold Damage": {"min": 3, "max": 14, "variable": false},
+        "7% Mana Stolen Per Hit": {"min": 7, "max": 7, "variable": false},
+        "+10 To Dexterity": {"min": 10, "max": 10, "variable": false},
+        "Replenish Life +20": {"min": 20, "max": 20, "variable": false},
+        "Increase Maximum Mana 15%": {"min": 15, "max": 15, "variable": false},
+        "All Resistances +30-40": {"min": 30, "max": 40, "variable": true},
+        "Level 4 Oak Sage (25 Charges)": {"min": 4, "max": 4, "variable": false},
+        "Level 14 Raven (60 Charges)": {"min": 14, "max": 14, "variable": false}
+      },
+      "tier": "S",
+      "popular_bases": ["Flail"]
+    },
+    "Spirit": {
+      "runes": ["Tal", "Thul", "Ort", "Amn"],
+      "bases": ["4 Socket Sword", "4 Socket Shield"],
+      "level_req": 25,
+      "mods": {
+        "+2 To All Skills": {"min": 2, "max": 2, "variable": false},
+        "+25-35% Faster Cast Rate": {"min": 25, "max": 35, "variable": true},
+        "+55% Faster Hit Recovery": {"min": 55, "max": 55, "variable": false},
+        "+250 Defense vs Missile": {"min": 250, "max": 250, "variable": false},
+        "+22 To Vitality": {"min": 22, "max": 22, "variable": false},
+        "+89-112 To Mana": {"min": 89, "max": 112, "variable": true},
+        "+3-8 Magic Absorb": {"min": 3, "max": 8, "variable": true},
+        "All Resistances +22-35 (Shield only)": {"min": 22, "max": 35, "variable": true}
+      },
+      "tier": "A",
+      "popular_bases": ["Monarch", "Crystal Sword", "Broad Sword"]
+    },
+    "Fortitude": {
+      "runes": ["El", "Sol", "Dol", "Lo"],
+      "bases": ["4 Socket Body Armor", "4 Socket Weapon"],
+      "level_req": 59,
+      "mods": {
+        "20% Chance To Cast Level 15 Chilling Armor when Struck": {"min": 20, "max": 20, "variable": false},
+        "+25% Faster Cast Rate": {"min": 25, "max": 25, "variable": false},
+        "+300% Enhanced Damage": {"min": 300, "max": 300, "variable": false},
+        "+200% Enhanced Defense": {"min": 200, "max": 200, "variable": false},
+        "+15 Defense": {"min": 15, "max": 15, "variable": false},
+        "+1-1.5 Life (per clvl, Armor)": {"min": 1, "max": 148, "variable": true, "per_level": true},
+        "+25-30 All Resistances (Armor)": {"min": 25, "max": 30, "variable": true},
+        "12% Damage Taken Goes To Mana": {"min": 12, "max": 12, "variable": false},
+        "+1 Light Radius": {"min": 1, "max": 1, "variable": false}
+      },
+      "tier": "S",
+      "popular_bases": ["Archon Plate", "Dusk Shroud", "Wire Fleece"]
+    },
+    "Chains of Honor": {
+      "runes": ["Dol", "Um", "Ber", "Ist"],
+      "bases": ["4 Socket Body Armor"],
+      "level_req": 63,
+      "mods": {
+        "+2 To All Skills": {"min": 2, "max": 2, "variable": false},
+        "+200% Damage to Demons": {"min": 200, "max": 200, "variable": false},
+        "+100% Damage to Undead": {"min": 100, "max": 100, "variable": false},
+        "8% Life Stolen Per Hit": {"min": 8, "max": 8, "variable": false},
+        "+70% Enhanced Defense": {"min": 70, "max": 70, "variable": false},
+        "+20 Strength": {"min": 20, "max": 20, "variable": false},
+        "Replenish Life +7": {"min": 7, "max": 7, "variable": false},
+        "All Resistances +65": {"min": 65, "max": 65, "variable": false},
+        "Damage Reduced By 8%": {"min": 8, "max": 8, "variable": false},
+        "25% Better Chance of Getting Magic Items": {"min": 25, "max": 25, "variable": false}
+      },
+      "tier": "S",
+      "popular_bases": ["Archon Plate", "Dusk Shroud", "Mage Plate"]
+    },
+    "Call to Arms": {
+      "runes": ["Amn", "Ral", "Mal", "Ist", "Ohm"],
+      "bases": ["5 Socket Weapon"],
+      "level_req": 57,
+      "mods": {
+        "+1 To All Skills": {"min": 1, "max": 1, "variable": false},
+        "+40% Increased Attack Speed": {"min": 40, "max": 40, "variable": false},
+        "+240-290% Enhanced Damage": {"min": 240, "max": 290, "variable": true},
+        "Adds 5-30 Fire Damage": {"min": 5, "max": 30, "variable": false},
+        "7% Life Stolen Per Hit": {"min": 7, "max": 7, "variable": false},
+        "+2-6 To Battle Command": {"min": 2, "max": 6, "variable": true},
+        "+1-6 To Battle Orders": {"min": 1, "max": 6, "variable": true},
+        "+1-4 To Battle Cry": {"min": 1, "max": 4, "variable": true},
+        "Prevent Monster Heal": {"min": 1, "max": 1, "variable": false},
+        "Replenish Life +12": {"min": 12, "max": 12, "variable": false},
+        "30% Better Chance of Getting Magic Items": {"min": 30, "max": 30, "variable": false}
+      },
+      "tier": "S",
+      "popular_bases": ["Crystal Sword", "Flail"]
+    },
+    "Insight": {
+      "runes": ["Ral", "Tir", "Tal", "Sol"],
+      "bases": ["4 Socket Polearm", "4 Socket Missile Weapon"],
+      "level_req": 27,
+      "mods": {
+        "Level 12-17 Meditation Aura When Equipped": {"min": 12, "max": 17, "variable": true},
+        "+35% Faster Cast Rate": {"min": 35, "max": 35, "variable": false},
+        "+200-260% Enhanced Damage": {"min": 200, "max": 260, "variable": true},
+        "+9 To Minimum Damage": {"min": 9, "max": 9, "variable": false},
+        "180-250% Bonus to Attack Rating": {"min": 180, "max": 250, "variable": true},
+        "Adds 5-30 Fire Damage": {"min": 5, "max": 30, "variable": false},
+        "+75 Poison Damage Over 5 Seconds": {"min": 75, "max": 75, "variable": false},
+        "+1-6 To Critical Strike": {"min": 1, "max": 6, "variable": true},
+        "+5 To All Attributes": {"min": 5, "max": 5, "variable": false},
+        "+2 Mana After Each Kill": {"min": 2, "max": 2, "variable": false},
+        "23% Better Chance of Getting Magic Items": {"min": 23, "max": 23, "variable": false}
+      },
+      "tier": "A",
+      "popular_bases": ["Thresher", "Colossus Voulge", "Cryptic Axe", "Great Poleaxe"]
+    },
+    "Last Wish": {
+      "runes": ["Jah", "Mal", "Jah", "Sur", "Jah", "Ber"],
+      "bases": ["6 Socket Sword", "6 Socket Hammer", "6 Socket Axe"],
+      "level_req": 65,
+      "mods": {
+        "6% Chance To Cast Level 11 Fade When Struck": {"min": 6, "max": 6, "variable": false},
+        "10% Chance To Cast Level 18 Life Tap On Striking": {"min": 10, "max": 10, "variable": false},
+        "20% Chance To Cast Level 20 Charged Bolt On Attack": {"min": 20, "max": 20, "variable": false},
+        "Level 17 Might Aura When Equipped": {"min": 17, "max": 17, "variable": false},
+        "+330-375% Enhanced Damage": {"min": 330, "max": 375, "variable": true},
+        "Ignore Target's Defense": {"min": 1, "max": 1, "variable": false},
+        "60-70% Chance of Crushing Blow": {"min": 60, "max": 70, "variable": true},
+        "Prevent Monster Heal": {"min": 1, "max": 1, "variable": false},
+        "Hit Blinds Target": {"min": 1, "max": 1, "variable": false},
+        "+0.5 Life per clvl": {"min": 0, "max": 49, "variable": true, "per_level": true}
+      },
+      "tier": "S",
+      "popular_bases": ["Phase Blade", "Berserker Axe"]
+    },
+    "Faith": {
+      "runes": ["Ohm", "Jah", "Lem", "Eld"],
+      "bases": ["4 Socket Missile Weapon"],
+      "level_req": 65,
+      "mods": {
+        "Level 12-15 Fanaticism Aura When Equipped": {"min": 12, "max": 15, "variable": true},
+        "+1-2 To All Skills": {"min": 1, "max": 2, "variable": true},
+        "+330% Enhanced Damage": {"min": 330, "max": 330, "variable": false},
+        "Ignore Target's Defense": {"min": 1, "max": 1, "variable": false},
+        "300% Bonus to Attack Rating": {"min": 300, "max": 300, "variable": false},
+        "+75% Damage to Undead": {"min": 75, "max": 75, "variable": false},
+        "+50 to Attack Rating Against Undead": {"min": 50, "max": 50, "variable": false},
+        "+120 Fire Damage": {"min": 120, "max": 120, "variable": false},
+        "All Resistances +15": {"min": 15, "max": 15, "variable": false},
+        "10% Reanimate As: Returned": {"min": 10, "max": 10, "variable": false},
+        "75% Extra Gold From Monsters": {"min": 75, "max": 75, "variable": false}
+      },
+      "tier": "S",
+      "popular_bases": ["Grand Matron Bow", "Matriarchal Bow"]
+    },
+    "Bramble": {
+      "runes": ["Ral", "Ohm", "Sur", "Eth"],
+      "bases": ["4 Socket Body Armor"],
+      "level_req": 61,
+      "mods": {
+        "Level 15-21 Thorns Aura When Equipped": {"min": 15, "max": 21, "variable": true},
+        "+50% Faster Hit Recovery": {"min": 50, "max": 50, "variable": false},
+        "+25-50% To Poison Skill Damage": {"min": 25, "max": 50, "variable": true},
+        "+300 Defense": {"min": 300, "max": 300, "variable": false},
+        "Increase Maximum Mana 5%": {"min": 5, "max": 5, "variable": false},
+        "Regenerate Mana 15%": {"min": 15, "max": 15, "variable": false},
+        "+5% To Maximum Cold Resist": {"min": 5, "max": 5, "variable": false},
+        "Fire Resist +30%": {"min": 30, "max": 30, "variable": false},
+        "Poison Resist +100%": {"min": 100, "max": 100, "variable": false},
+        "+13 Life After Each Kill": {"min": 13, "max": 13, "variable": false},
+        "Level 13 Spirit of Barbs (33 Charges)": {"min": 13, "max": 13, "variable": false}
+      },
+      "tier": "A",
+      "popular_bases": ["Archon Plate", "Dusk Shroud"]
+    },
+    "Breath of the Dying": {
+      "runes": ["Vex", "Hel", "El", "Eld", "Zod", "Eth"],
+      "bases": ["6 Socket Weapon"],
+      "level_req": 69,
+      "mods": {
+        "50% Chance To Cast Level 20 Poison Nova When You Kill An Enemy": {"min": 50, "max": 50, "variable": false},
+        "Indestructible": {"min": 1, "max": 1, "variable": false},
+        "+60% Increased Attack Speed": {"min": 60, "max": 60, "variable": false},
+        "+350-400% Enhanced Damage": {"min": 350, "max": 400, "variable": true},
+        "-25% Target Defense": {"min": 25, "max": 25, "variable": false},
+        "+200% Damage to Undead": {"min": 200, "max": 200, "variable": false},
+        "+50 To Attack Rating Against Undead": {"min": 50, "max": 50, "variable": false},
+        "7% Mana Stolen Per Hit": {"min": 7, "max": 7, "variable": false},
+        "12-15% Life Stolen Per Hit": {"min": 12, "max": 15, "variable": true},
+        "Prevent Monster Heal": {"min": 1, "max": 1, "variable": false},
+        "+30 To All Attributes": {"min": 30, "max": 30, "variable": false},
+        "+1 Light Radius": {"min": 1, "max": 1, "variable": false},
+        "Requirements -20%": {"min": 20, "max": 20, "variable": false}
+      },
+      "tier": "S",
+      "popular_bases": ["Colossus Blade", "Berserker Axe", "War Pike"]
+    }
+  },
+  "unique_items": {
+    "weapons": {
+      "Shako (Harlequin Crest)": {
+        "type": "Shako",
+        "slot": "helm",
+        "level_req": 62,
+        "mods": {
+          "+2 To All Skills": {"min": 2, "max": 2, "variable": false},
+          "+1-148 To Life (1.5 per clvl)": {"min": 1, "max": 148, "variable": true, "per_level": true},
+          "+1-148 To Mana (1.5 per clvl)": {"min": 1, "max": 148, "variable": true, "per_level": true},
+          "Damage Reduced By 10%": {"min": 10, "max": 10, "variable": false},
+          "50% Better Chance of Getting Magic Items": {"min": 50, "max": 50, "variable": false},
+          "+2 To All Attributes": {"min": 2, "max": 2, "variable": false}
+        },
+        "tier": "S",
+        "est_fg": "200-400"
+      },
+      "Arachnid Mesh": {
+        "type": "Spiderweb Sash",
+        "slot": "belt",
+        "level_req": 80,
+        "mods": {
+          "+1 To All Skills": {"min": 1, "max": 1, "variable": false},
+          "+20% Faster Cast Rate": {"min": 20, "max": 20, "variable": false},
+          "Slows Target By 10%": {"min": 10, "max": 10, "variable": false},
+          "+90-120% Enhanced Defense": {"min": 90, "max": 120, "variable": true},
+          "Increases Maximum Mana 5%": {"min": 5, "max": 5, "variable": false},
+          "Level 3 Venom (11 Charges)": {"min": 3, "max": 3, "variable": false}
+        },
+        "tier": "S",
+        "est_fg": "300-600"
+      },
+      "Mara's Kaleidoscope": {
+        "type": "Amulet",
+        "slot": "amulet",
+        "level_req": 67,
+        "mods": {
+          "+2 To All Skills": {"min": 2, "max": 2, "variable": false},
+          "All Resistances +20-30": {"min": 20, "max": 30, "variable": true},
+          "+5 To All Attributes": {"min": 5, "max": 5, "variable": false}
+        },
+        "tier": "S",
+        "est_fg": "100-500"
+      },
+      "The Stone of Jordan": {
+        "type": "Ring",
+        "slot": "ring",
+        "level_req": 29,
+        "mods": {
+          "+1 To All Skills": {"min": 1, "max": 1, "variable": false},
+          "Increases Maximum Mana By 25%": {"min": 25, "max": 25, "variable": false},
+          "Adds 1-12 Lightning Damage": {"min": 1, "max": 12, "variable": false},
+          "+20 To Mana": {"min": 20, "max": 20, "variable": false}
+        },
+        "tier": "S",
+        "est_fg": "200-400"
+      },
+      "Bul-Kathos' Wedding Band": {
+        "type": "Ring",
+        "slot": "ring",
+        "level_req": 58,
+        "mods": {
+          "+1 To All Skills": {"min": 1, "max": 1, "variable": false},
+          "+0.5 Life per clvl": {"min": 0, "max": 49, "variable": true, "per_level": true},
+          "3-5% Life Stolen Per Hit": {"min": 3, "max": 5, "variable": true},
+          "+50 Maximum Stamina": {"min": 50, "max": 50, "variable": false}
+        },
+        "tier": "A",
+        "est_fg": "100-200"
+      },
+      "Titan's Revenge": {
+        "type": "Ceremonial Javelin",
+        "slot": "weapon",
+        "level_req": 42,
+        "mods": {
+          "+2 To Amazon Skill Levels": {"min": 2, "max": 2, "variable": false},
+          "+2 To Javelin and Spear Skills": {"min": 2, "max": 2, "variable": false},
+          "+150-200% Enhanced Damage": {"min": 150, "max": 200, "variable": true},
+          "+20 To Strength": {"min": 20, "max": 20, "variable": false},
+          "+20 To Dexterity": {"min": 20, "max": 20, "variable": false},
+          "Replenishes Quantity": {"min": 1, "max": 1, "variable": false},
+          "Increased Stack Size": {"min": 1, "max": 1, "variable": false},
+          "5-9% Life Stolen Per Hit": {"min": 5, "max": 9, "variable": true}
+        },
+        "tier": "S",
+        "est_fg": "50-200"
+      },
+      "Griffon's Eye": {
+        "type": "Diadem",
+        "slot": "helm",
+        "level_req": 76,
+        "mods": {
+          "+1 To All Skills": {"min": 1, "max": 1, "variable": false},
+          "+25% Faster Cast Rate": {"min": 25, "max": 25, "variable": false},
+          "-(15-20)% To Enemy Lightning Resistance": {"min": 15, "max": 20, "variable": true},
+          "+(10-15)% To Lightning Skill Damage": {"min": 10, "max": 15, "variable": true},
+          "+100-200 Defense": {"min": 100, "max": 200, "variable": true}
+        },
+        "tier": "S",
+        "est_fg": "3000-15000"
+      },
+      "Death's Fathom": {
+        "type": "Dimensional Shard",
+        "slot": "weapon",
+        "level_req": 73,
+        "mods": {
+          "+3 To Sorceress Skill Levels": {"min": 3, "max": 3, "variable": false},
+          "+20% Faster Cast Rate": {"min": 20, "max": 20, "variable": false},
+          "+(15-30)% To Cold Skill Damage": {"min": 15, "max": 30, "variable": true},
+          "Lightning Resist +(25-40)%": {"min": 25, "max": 40, "variable": true},
+          "Fire Resist +(25-40)%": {"min": 25, "max": 40, "variable": true}
+        },
+        "tier": "S",
+        "est_fg": "2000-10000"
+      },
+      "Tal Rasha's Guardianship": {
+        "type": "Lacquered Plate",
+        "slot": "body_armor",
+        "level_req": 71,
+        "mods": {
+          "Magic Damage Reduced By 15": {"min": 15, "max": 15, "variable": false},
+          "+400 Defense": {"min": 400, "max": 400, "variable": false},
+          "Cold Resist +40%": {"min": 40, "max": 40, "variable": false},
+          "Lightning Resist +40%": {"min": 40, "max": 40, "variable": false},
+          "Fire Resist +40%": {"min": 40, "max": 40, "variable": false},
+          "88% Better Chance of Getting Magic Items": {"min": 88, "max": 88, "variable": false}
+        },
+        "tier": "A",
+        "est_fg": "300-600"
+      },
+      "Annihilus": {
+        "type": "Small Charm",
+        "slot": "inventory",
+        "level_req": 70,
+        "mods": {
+          "+1 To All Skills": {"min": 1, "max": 1, "variable": false},
+          "+10-20 To All Attributes": {"min": 10, "max": 20, "variable": true},
+          "All Resistances +10-20": {"min": 10, "max": 20, "variable": true},
+          "+5-10% To Experience Gained": {"min": 5, "max": 10, "variable": true}
+        },
+        "tier": "S",
+        "est_fg": "200-2000"
+      },
+      "Torch (Hellfire Torch)": {
+        "type": "Large Charm",
+        "slot": "inventory",
+        "level_req": 75,
+        "mods": {
+          "+3 To Random Class Skills": {"min": 3, "max": 3, "variable": false, "note": "Rolls one of 7 classes"},
+          "+10-20 To All Attributes": {"min": 10, "max": 20, "variable": true},
+          "All Resistances +10-20": {"min": 10, "max": 20, "variable": true},
+          "+8 To Light Radius": {"min": 8, "max": 8, "variable": false},
+          "Level 30 Hydra (10 Charges)": {"min": 30, "max": 30, "variable": false}
+        },
+        "tier": "S",
+        "est_fg": "50-3000"
+      },
+      "War Traveler": {
+        "type": "Battle Boots",
+        "slot": "boots",
+        "level_req": 42,
+        "mods": {
+          "+150-190% Enhanced Defense": {"min": 150, "max": 190, "variable": true},
+          "25% Faster Run/Walk": {"min": 25, "max": 25, "variable": false},
+          "+10 To Vitality": {"min": 10, "max": 10, "variable": false},
+          "+10 To Strength": {"min": 10, "max": 10, "variable": false},
+          "Adds 15-25 Damage": {"min": 15, "max": 25, "variable": false},
+          "+40% Slower Stamina Drain": {"min": 40, "max": 40, "variable": false},
+          "Attacker Takes Damage Of 5-10": {"min": 5, "max": 10, "variable": true},
+          "30-50% Better Chance of Getting Magic Items": {"min": 30, "max": 50, "variable": true}
+        },
+        "tier": "A",
+        "est_fg": "50-500"
+      },
+      "Chance Guards": {
+        "type": "Chain Gloves",
+        "slot": "gloves",
+        "level_req": 15,
+        "mods": {
+          "+20-30% Enhanced Defense": {"min": 20, "max": 30, "variable": true},
+          "+15 Defense": {"min": 15, "max": 15, "variable": false},
+          "+25-40% Better Chance of Getting Magic Items": {"min": 25, "max": 40, "variable": true},
+          "200% Extra Gold From Monsters": {"min": 200, "max": 200, "variable": false},
+          "+2 To Light Radius": {"min": 2, "max": 2, "variable": false}
+        },
+        "tier": "B",
+        "est_fg": "5-40"
+      },
+      "Gheeds Fortune": {
+        "type": "Grand Charm",
+        "slot": "inventory",
+        "level_req": 62,
+        "mods": {
+          "80-160% Extra Gold From Monsters": {"min": 80, "max": 160, "variable": true},
+          "Reduces All Vendor Prices 10-15%": {"min": 10, "max": 15, "variable": true},
+          "20-40% Better Chance of Getting Magic Items": {"min": 20, "max": 40, "variable": true}
+        },
+        "tier": "B",
+        "est_fg": "5-100"
+      }
+    }
+  },
+  "valuable_bases": {
+    "eth_bases": {
+      "description": "Ethereal bases are valuable because they have 50% more base defense (armor) or damage (weapons) but cannot be repaired normally. Combined with Indestructible runewords or merc use, they become best-in-slot.",
+      "armor": [
+        {"name": "Eth Archon Plate", "sockets": [3, 4], "why": "Low STR req (103), high defense. Best for Enigma, Fortitude, CoH", "est_fg": "50-500"},
+        {"name": "Eth Dusk Shroud", "sockets": [3, 4], "why": "Lowest STR req elite armor (77). Great for Enigma", "est_fg": "30-300"},
+        {"name": "Eth Sacred Armor", "sockets": [3, 4], "why": "Highest base defense. Used for merc Fortitude/Treachery", "est_fg": "20-200"},
+        {"name": "Eth Wire Fleece", "sockets": [3, 4], "why": "High defense, moderate STR req", "est_fg": "20-100"},
+        {"name": "Eth Lacquered Plate", "sockets": [3, 4], "why": "High defense elite armor", "est_fg": "15-80"}
+      ],
+      "weapons": [
+        {"name": "Eth Thresher", "sockets": 4, "why": "Best Infinity base (fast attack speed)", "est_fg": "100-500"},
+        {"name": "Eth Giant Thresher", "sockets": 4, "why": "Fastest polearm. Premium Infinity base", "est_fg": "200-800"},
+        {"name": "Eth Colossus Voulge", "sockets": 4, "why": "Highest damage polearm. Good Insight/Infinity base", "est_fg": "50-200"},
+        {"name": "Eth Cryptic Axe", "sockets": 4, "why": "Good balance of speed and damage for polearm RWs", "est_fg": "50-200"},
+        {"name": "Eth Berserker Axe", "sockets": [5, 6], "why": "Self-repairing with Grief/BotD. Best melee weapon base", "est_fg": "200-1000"},
+        {"name": "Eth Colossus Blade", "sockets": [5, 6], "why": "Top BotD base", "est_fg": "100-400"}
+      ],
+      "shields": [
+        {"name": "Eth Vortex Shield (45 Res)", "sockets": 4, "why": "Highest base block + built-in res for Exile", "est_fg": "200-1000"},
+        {"name": "Eth Sacred Targe (45 Res)", "sockets": 4, "why": "Best Exile base, high res paladin shield", "est_fg": "300-1500"}
+      ]
+    },
+    "non_eth_bases": [
+      {"name": "Monarch", "sockets": 4, "why": "Only non-paladin shield with 4 sockets. Required for Spirit shield", "est_fg": "1-5"},
+      {"name": "Phase Blade", "sockets": 5, "why": "Indestructible, fast attack. Best Grief base", "est_fg": "5-20"},
+      {"name": "Flail", "sockets": 4, "why": "Best HotO base (low requirements)", "est_fg": "1-3"},
+      {"name": "Archon Plate", "sockets": [3, 4], "why": "Best non-eth Enigma/CoH base", "est_fg": "5-30"},
+      {"name": "Mage Plate", "sockets": 3, "why": "Lowest STR req for Enigma (55 STR)", "est_fg": "5-30"},
+      {"name": "Dusk Shroud", "sockets": [3, 4], "why": "Low STR req, good for casters", "est_fg": "5-20"},
+      {"name": "Grand Matron Bow +3 skills", "sockets": 4, "why": "Best Faith base for Bowazons", "est_fg": "100-500"},
+      {"name": "45@ Paladin Shields", "sockets": 4, "why": "Maximum resistance base for Spirit/Exile", "est_fg": "50-300"}
+    ]
+  },
+  "gear_slots": [
+    "helm", "body_armor", "weapon", "shield", "gloves", "boots",
+    "belt", "amulet", "ring1", "ring2",
+    "weapon_swap", "shield_swap",
+    "inventory", "stash"
+  ],
+  "item_qualities": [
+    "Normal", "Superior", "Magic", "Rare", "Set", "Unique", "Crafted", "Runeword"
+  ]
+}

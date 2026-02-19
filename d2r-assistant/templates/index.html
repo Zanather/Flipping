@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+{% block title %}D2R Assistant - Inventory{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Stats Overview -->
+    <div class="col-12 mb-3">
+        <div class="row g-3">
+            <div class="col-md-3 col-6">
+                <div class="d2r-card stat-card">
+                    <div class="stat-value">{{ tally.total_items }}</div>
+                    <div class="stat-label">Total Items</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="d2r-card stat-card">
+                    <div class="stat-value">{{ characters|length }}</div>
+                    <div class="stat-label">Characters</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="d2r-card stat-card">
+                    <div class="stat-value">{{ tally.shared_stash_count }}</div>
+                    <div class="stat-label">Shared Stash</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="d2r-card stat-card">
+                    <div class="stat-value">{{ tally.by_quality|length }}</div>
+                    <div class="stat-label">Item Types</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Characters Panel -->
+    <div class="col-lg-8">
+        <div class="d2r-card">
+            <div class="d2r-card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-people"></i> Characters</span>
+                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#newCharModal">
+                    <i class="bi bi-plus-lg"></i> New Character
+                </button>
+            </div>
+
+            {% if characters %}
+            <div class="row g-2">
+                {% for char in characters %}
+                <div class="col-md-6">
+                    <a href="/character/{{ char.name }}" class="text-decoration-none">
+                        <div class="inventory-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="quality-unique">{{ char.name }}</strong>
+                                    <div class="text-muted small">Level {{ char.level }} {{ char.class }}</div>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="event.preventDefault(); deleteCharacter('{{ char.name }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2 small">
+                                <span class="text-muted">Equipped:</span> {{ char.equipped_count }} |
+                                <span class="text-muted">Inv:</span> {{ char.inventory_count }} |
+                                <span class="text-muted">Stash:</span> {{ char.stash_count }}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-person-plus" style="font-size: 2rem;"></i>
+                <p class="mt-2">No characters yet. Create one to start tracking your gear.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Shared Stash -->
+        <div class="d2r-card">
+            <div class="d2r-card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-box-seam"></i> Shared Stash</span>
+                <button class="btn btn-sm btn-outline-warning" onclick="showAddToStash('shared')">
+                    <i class="bi bi-plus-lg"></i> Add Item
+                </button>
+            </div>
+            <ul class="nav nav-tabs stash-tabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sharedTab1">Tab 1</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#sharedTab2">Tab 2</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#sharedTab3">Tab 3</button>
+                </li>
+            </ul>
+            <div class="tab-content pt-3">
+                <div class="tab-pane fade show active" id="sharedTab1">
+                    <div id="sharedStashTab1" class="inventory-grid"></div>
+                </div>
+                <div class="tab-pane fade" id="sharedTab2">
+                    <div id="sharedStashTab2" class="inventory-grid"></div>
+                </div>
+                <div class="tab-pane fade" id="sharedTab3">
+                    <div id="sharedStashTab3" class="inventory-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Sidebar -->
+    <div class="col-lg-4">
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-lightning"></i> Quick Actions</div>
+            <div class="d-grid gap-2">
+                <a href="/analyzer" class="btn btn-outline-info btn-sm">
+                    <i class="bi bi-search"></i> Analyze Item
+                </a>
+                <a href="/prices" class="btn btn-outline-warning btn-sm">
+                    <i class="bi bi-currency-exchange"></i> Price Check
+                </a>
+                <a href="/trade" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-shop"></i> Create Trade Post
+                </a>
+                <a href="/guides" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-book"></i> Build Guides
+                </a>
+            </div>
+        </div>
+
+        <!-- Item Tally -->
+        {% if tally.by_quality %}
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-bar-chart"></i> Item Breakdown</div>
+            {% for quality, count in tally.by_quality.items() %}
+            <div class="d-flex justify-content-between mb-1">
+                <span class="quality-{{ quality|lower }}">{{ quality }}</span>
+                <span class="text-muted">{{ count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Quick FG/HR Converter -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-arrow-left-right"></i> FG / HR Converter</div>
+            <div class="mb-2">
+                <label class="form-label small">Forum Gold Amount</label>
+                <input type="number" class="form-control form-control-sm" id="fgInput"
+                       placeholder="Enter FG amount" onchange="convertFgToHr()">
+            </div>
+            <div id="hrOutput" class="price-hr text-center py-2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- New Character Modal -->
+<div class="modal fade" id="newCharModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title quality-unique">Create Character</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Character Name</label>
+                    <input type="text" class="form-control" id="charName" placeholder="e.g. MyHammerdin">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Class</label>
+                    <select class="form-select" id="charClass">
+                        <option value="Amazon">Amazon</option>
+                        <option value="Necromancer">Necromancer</option>
+                        <option value="Barbarian">Barbarian</option>
+                        <option value="Sorceress">Sorceress</option>
+                        <option value="Paladin">Paladin</option>
+                        <option value="Druid">Druid</option>
+                        <option value="Assassin">Assassin</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Level</label>
+                    <input type="number" class="form-control" id="charLevel" value="1" min="1" max="99">
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" onclick="createCharacter()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add to Stash Modal -->
+<div class="modal fade" id="addStashModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Add Item to Stash</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Item Name</label>
+                    <input type="text" class="form-control" id="stashItemName" placeholder="e.g. Shako">
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Quality</label>
+                        <select class="form-select" id="stashItemQuality">
+                            <option value="Unique">Unique</option>
+                            <option value="Set">Set</option>
+                            <option value="Rare">Rare</option>
+                            <option value="Magic">Magic</option>
+                            <option value="Runeword">Runeword</option>
+                            <option value="Normal">Normal</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Tab</label>
+                        <select class="form-select" id="stashTab">
+                            <option value="tab1">Tab 1</option>
+                            <option value="tab2">Tab 2</option>
+                            <option value="tab3">Tab 3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="stashItemEth">
+                    <label class="form-check-label">Ethereal</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Notes</label>
+                    <input type="text" class="form-control" id="stashItemNotes" placeholder="Optional notes">
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" onclick="addToStash()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function createCharacter() {
+    const name = document.getElementById('charName').value;
+    const charClass = document.getElementById('charClass').value;
+    const level = parseInt(document.getElementById('charLevel').value);
+
+    const res = await fetch('/api/characters', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, class: charClass, level})
+    });
+    const data = await res.json();
+    if (data.error) {
+        showToast(data.error, 'danger');
+    } else {
+        showToast(`Character "${name}" created!`, 'success');
+        setTimeout(() => location.reload(), 500);
+    }
+}
+
+async function deleteCharacter(name) {
+    if (!confirm(`Delete character "${name}" and all their gear?`)) return;
+    const res = await fetch(`/api/characters/${name}`, {method: 'DELETE'});
+    const data = await res.json();
+    if (data.success) {
+        showToast(`Character "${name}" deleted.`, 'success');
+        setTimeout(() => location.reload(), 500);
+    }
+}
+
+function showAddToStash(type) {
+    document.getElementById('addStashModal').dataset.stashType = type;
+    new bootstrap.Modal(document.getElementById('addStashModal')).show();
+}
+
+async function addToStash() {
+    const item = {
+        name: document.getElementById('stashItemName').value,
+        quality: document.getElementById('stashItemQuality').value,
+        ethereal: document.getElementById('stashItemEth').checked,
+        notes: document.getElementById('stashItemNotes').value,
+    };
+    const tab = document.getElementById('stashTab').value;
+
+    const res = await fetch('/api/stash', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({item, stash_type: 'shared', tab})
+    });
+    const data = await res.json();
+    if (data.success) {
+        showToast('Item added to stash!', 'success');
+        setTimeout(() => location.reload(), 500);
+    }
+}
+
+async function convertFgToHr() {
+    const fg = document.getElementById('fgInput').value;
+    if (!fg) return;
+    const res = await fetch(`/api/convert/fg-to-hr?fg=${fg}`);
+    const data = await res.json();
+    document.getElementById('hrOutput').textContent = data.hr || '-';
+}
+
+// Load shared stash on page load
+async function loadSharedStash() {
+    const res = await fetch('/api/stash?type=shared');
+    const tabs = await res.json();
+    for (const [tab, items] of Object.entries(tabs)) {
+        const container = document.getElementById(`sharedStash${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+        if (!container) continue;
+        if (items.length === 0) {
+            container.innerHTML = '<div class="text-muted small">Empty</div>';
+        } else {
+            container.innerHTML = items.map(item => `
+                <div class="inventory-item">
+                    <div class="d-flex justify-content-between">
+                        <span class="quality-${(item.quality || 'normal').toLowerCase()}">${item.ethereal ? 'ETH ' : ''}${item.name}</span>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromStash('${item.id}', '${tab}')">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    ${item.notes ? `<div class="text-muted small">${item.notes}</div>` : ''}
+                </div>
+            `).join('');
+        }
+    }
+}
+
+async function removeFromStash(itemId, tab) {
+    await fetch(`/api/stash/${itemId}?type=shared&tab=${tab}`, {method: 'DELETE'});
+    loadSharedStash();
+}
+
+document.addEventListener('DOMContentLoaded', loadSharedStash);
+</script>
+{% endblock %}

@@ -1,0 +1,408 @@
+/* D2R Inventory Assistant - Styles */
+
+:root {
+    --d2r-gold: #c7b377;
+    --d2r-unique: #c4a24e;
+    --d2r-set: #00ff00;
+    --d2r-rare: #ffff00;
+    --d2r-magic: #6969ff;
+    --d2r-normal: #ffffff;
+    --d2r-eth: #808080;
+    --d2r-runeword: #c4a24e;
+    --d2r-bg-dark: #1a1a2e;
+    --d2r-bg-card: #16213e;
+    --d2r-bg-panel: #0f3460;
+    --d2r-accent: #e94560;
+    --quality-perfect: #FFD700;
+    --quality-high: #00FF00;
+    --quality-above: #90EE90;
+    --quality-avg: #FFFF00;
+    --quality-below: #FFA500;
+    --quality-low: #FF4444;
+    --tier-s: #FFD700;
+    --tier-a: #00FF00;
+    --tier-b: #6969ff;
+    --tier-c: #808080;
+}
+
+body {
+    background-color: var(--d2r-bg-dark);
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Navbar */
+.d2r-brand {
+    color: var(--d2r-gold) !important;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.navbar {
+    background: linear-gradient(180deg, #1a1a2e, #0f3460) !important;
+}
+
+/* Cards */
+.d2r-card {
+    background: var(--d2r-bg-card);
+    border: 1px solid #2a2a4a;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s;
+}
+
+.d2r-card:hover {
+    border-color: var(--d2r-gold);
+}
+
+.d2r-card-header {
+    color: var(--d2r-gold);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #2a2a4a;
+}
+
+/* Item Quality Colors */
+.quality-unique { color: var(--d2r-unique); }
+.quality-set { color: var(--d2r-set); }
+.quality-rare { color: var(--d2r-rare); }
+.quality-magic { color: var(--d2r-magic); }
+.quality-normal { color: var(--d2r-normal); }
+.quality-runeword { color: var(--d2r-runeword); }
+.quality-eth { color: var(--d2r-eth); font-style: italic; }
+
+/* Tier Badges */
+.tier-badge {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.tier-s { background: var(--tier-s); color: #000; }
+.tier-a { background: var(--tier-a); color: #000; }
+.tier-b { background: var(--tier-b); color: #fff; }
+.tier-c { background: var(--tier-c); color: #fff; }
+
+/* Roll Quality Indicators */
+.roll-bar {
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 2px;
+}
+
+.roll-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.roll-perfect { background: var(--quality-perfect); }
+.roll-high { background: var(--quality-high); }
+.roll-above { background: var(--quality-above); }
+.roll-avg { background: var(--quality-avg); }
+.roll-below { background: var(--quality-below); }
+.roll-low { background: var(--quality-low); }
+
+/* Gear Slots Grid */
+.gear-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.gear-slot {
+    background: rgba(15, 52, 96, 0.5);
+    border: 1px dashed #444;
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    min-height: 70px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gear-slot:hover {
+    border-color: var(--d2r-gold);
+    background: rgba(15, 52, 96, 0.8);
+}
+
+.gear-slot.filled {
+    border-style: solid;
+    border-color: var(--d2r-unique);
+}
+
+.gear-slot-label {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.gear-slot-item {
+    font-size: 0.85rem;
+    color: var(--d2r-unique);
+    margin-top: 4px;
+}
+
+/* Inventory Grid */
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.inventory-item {
+    background: rgba(22, 33, 62, 0.8);
+    border: 1px solid #2a2a4a;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.inventory-item:hover {
+    border-color: var(--d2r-gold);
+    transform: translateY(-1px);
+}
+
+/* Stash Tabs */
+.stash-tabs .nav-link {
+    color: #888;
+    border-color: transparent;
+}
+
+.stash-tabs .nav-link.active {
+    color: var(--d2r-gold);
+    background: var(--d2r-bg-card);
+    border-color: #2a2a4a #2a2a4a var(--d2r-bg-card);
+}
+
+/* Price Display */
+.price-fg {
+    color: var(--d2r-gold);
+    font-weight: 600;
+}
+
+.price-hr {
+    color: #ff9900;
+    font-size: 0.85rem;
+}
+
+.price-range {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+/* Trade Post Preview */
+.trade-preview {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 1rem;
+    font-family: monospace;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Stats Dashboard */
+.stat-card {
+    text-align: center;
+    padding: 1rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--d2r-gold);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+/* Build Guide */
+.build-card {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.build-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.skill-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.skill-name {
+    flex: 1;
+    font-size: 0.85rem;
+}
+
+.skill-points {
+    background: var(--d2r-bg-panel);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--d2r-gold);
+}
+
+/* Breakpoint Table */
+.bp-table {
+    font-size: 0.85rem;
+}
+
+.bp-table .bp-current {
+    background: rgba(0, 255, 0, 0.1);
+    border-left: 3px solid var(--d2r-set);
+}
+
+.bp-table .bp-next {
+    background: rgba(255, 255, 0, 0.1);
+    border-left: 3px solid var(--d2r-rare);
+}
+
+/* Watchlist */
+.watchlist-item {
+    padding: 6px 12px;
+    border-left: 3px solid var(--d2r-gold);
+    margin-bottom: 4px;
+    background: rgba(22, 33, 62, 0.5);
+    font-size: 0.9rem;
+}
+
+/* Mod Analysis */
+.mod-row {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(42, 42, 74, 0.5);
+}
+
+.mod-name {
+    flex: 1;
+    font-size: 0.85rem;
+}
+
+.mod-value {
+    min-width: 60px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.mod-range {
+    min-width: 80px;
+    text-align: center;
+    color: #888;
+    font-size: 0.8rem;
+}
+
+.mod-quality {
+    min-width: 70px;
+    text-align: right;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Item Form */
+.item-form {
+    max-width: 600px;
+}
+
+.mod-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+    align-items: center;
+}
+
+.mod-input-row input {
+    flex: 1;
+}
+
+.mod-input-row .btn-remove {
+    padding: 2px 8px;
+    font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .gear-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .inventory-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--d2r-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Copy button */
+.btn-copy {
+    position: relative;
+}
+
+.btn-copy.copied::after {
+    content: 'Copied!';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--d2r-set);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}

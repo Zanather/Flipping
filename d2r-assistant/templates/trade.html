@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}D2R Assistant - Trade{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Trade Post Generator -->
+    <div class="col-lg-7">
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-shop"></i> Trade Post Generator</div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Platform</label>
+                    <select class="form-select" id="tradePlatform">
+                        <option value="d2jsp">D2JSP</option>
+                        <option value="traderie">Traderie</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label class="form-label">Mode</label>
+                    <select class="form-select" id="tradeMode">
+                        <option value="ft">For Trade (FT)</option>
+                        <option value="iso">In Search Of (ISO)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="tradeItems">
+                <label class="form-label d-flex justify-content-between">
+                    <span>Items</span>
+                    <button class="btn btn-sm btn-outline-warning" onclick="addTradeItem()">+ Add Item</button>
+                </label>
+                <div id="tradeItemList"></div>
+            </div>
+
+            <button class="btn btn-warning w-100 mt-3" onclick="generateTradePost()">
+                <i class="bi bi-file-text"></i> Generate Post
+            </button>
+        </div>
+
+        <!-- Generated Post Preview -->
+        <div class="d2r-card" id="postPreview" style="display:none;">
+            <div class="d2r-card-header d-flex justify-content-between">
+                <span><i class="bi bi-eye"></i> Post Preview</span>
+                <button class="btn btn-sm btn-outline-success btn-copy" onclick="copyPost()">
+                    <i class="bi bi-clipboard"></i> Copy
+                </button>
+            </div>
+            <div id="postTitle" class="mb-2 quality-unique fw-bold"></div>
+            <div class="trade-preview" id="postBody"></div>
+        </div>
+
+        <!-- Record Sale/Purchase -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-receipt"></i> Record Transaction</div>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" class="form-control form-control-sm" id="txItem" placeholder="Item name">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control form-control-sm" id="txPrice" placeholder="FG">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select form-select-sm" id="txPlatform">
+                        <option value="d2jsp">D2JSP</option>
+                        <option value="traderie">Traderie</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select form-select-sm" id="txType">
+                        <option value="sale">Sale</option>
+                        <option value="purchase">Purchase</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-sm btn-warning w-100" onclick="recordTransaction()">Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade History & Summary -->
+    <div class="col-lg-5">
+        <!-- Summary -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-graph-up"></i> Trade Summary</div>
+            <div class="row g-2 text-center">
+                <div class="col-4">
+                    <div class="stat-value" style="font-size:1.4rem">{{ summary.total_sales }}</div>
+                    <div class="stat-label">Sales</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-value" style="font-size:1.4rem">{{ summary.total_purchases }}</div>
+                    <div class="stat-label">Purchases</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-value" style="font-size:1.4rem; color: {{ '#00ff00' if summary.net_fg >= 0 else '#ff4444' }}">
+                        {{ summary.net_fg }} FG
+                    </div>
+                    <div class="stat-label">Net FG</div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-6">
+                    <div class="small text-muted">Total Sold</div>
+                    <div class="price-fg">{{ summary.total_sold_fg }} FG</div>
+                </div>
+                <div class="col-6">
+                    <div class="small text-muted">Total Bought</div>
+                    <div class="price-fg">{{ summary.total_bought_fg }} FG</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent History -->
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-clock-history"></i> Recent Posts</div>
+            {% if history %}
+            {% for post in history | reverse %}
+            <div class="inventory-item mb-2">
+                <div class="d-flex justify-content-between">
+                    <span class="badge bg-{{ 'success' if post.mode == 'ft' else 'info' }}">{{ post.mode|upper }}</span>
+                    <span class="badge bg-secondary">{{ post.platform }}</span>
+                </div>
+                <div class="small mt-1">
+                    {{ post.items | join(', ') | truncate(80) }}
+                </div>
+                <div class="text-muted" style="font-size:0.7rem">{{ post.created_at[:16] }}</div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-muted small">No trade posts yet.</div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Sales -->
+        {% if summary.recent_sales %}
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-cash-stack"></i> Recent Sales</div>
+            {% for sale in summary.recent_sales | reverse %}
+            <div class="d-flex justify-content-between mb-2">
+                <span>{{ sale.item }}</span>
+                <span class="price-fg">{{ sale.price_fg }} FG</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let tradeItemCount = 0;
+
+function addTradeItem(name, specs) {
+    const id = tradeItemCount++;
+    const container = document.getElementById('tradeItemList');
+    const div = document.createElement('div');
+    div.className = 'inventory-item mb-2';
+    div.id = `trade-item-${id}`;
+    div.innerHTML = `
+        <div class="row g-2">
+            <div class="col-5">
+                <input type="text" class="form-control form-control-sm" placeholder="Item name"
+                       data-field="name" value="${name || ''}">
+            </div>
+            <div class="col-4">
+                <input type="text" class="form-control form-control-sm" placeholder="Specs (optional)"
+                       data-field="specs" value="${specs || ''}">
+            </div>
+            <div class="col-2">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" data-field="ethereal">
+                    <label class="form-check-label small">Eth</label>
+                </div>
+            </div>
+            <div class="col-1">
+                <button class="btn btn-sm btn-outline-danger" onclick="document.getElementById('trade-item-${id}').remove()">x</button>
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function getTradeItems() {
+    const items = [];
+    const container = document.getElementById('tradeItemList');
+    for (const div of container.children) {
+        const nameInput = div.querySelector('[data-field="name"]');
+        const specsInput = div.querySelector('[data-field="specs"]');
+        const ethInput = div.querySelector('[data-field="ethereal"]');
+        if (nameInput && nameInput.value) {
+            items.push({
+                name: nameInput.value,
+                specs: specsInput ? specsInput.value : '',
+                ethereal: ethInput ? ethInput.checked : false,
+            });
+        }
+    }
+    return items;
+}
+
+async function generateTradePost() {
+    const items = getTradeItems();
+    if (items.length === 0) {
+        showToast('Add at least one item.', 'warning');
+        return;
+    }
+
+    const platform = document.getElementById('tradePlatform').value;
+    const mode = document.getElementById('tradeMode').value;
+
+    const res = await fetch('/api/trade/generate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({platform, mode, items})
+    });
+    const data = await res.json();
+
+    const preview = document.getElementById('postPreview');
+    preview.style.display = 'block';
+
+    if (data.title) {
+        document.getElementById('postTitle').textContent = data.title;
+        document.getElementById('postBody').textContent = data.body;
+    } else if (Array.isArray(data)) {
+        document.getElementById('postTitle').textContent = 'Traderie Listings';
+        document.getElementById('postBody').textContent = data.map(l =>
+            `${l.item_name}\n${l.description}\nLooking for: ${l.looking_for.join(', ')}\n`
+        ).join('\n---\n');
+    }
+
+    showToast('Trade post generated!', 'success');
+}
+
+function copyPost() {
+    const title = document.getElementById('postTitle').textContent;
+    const body = document.getElementById('postBody').textContent;
+    navigator.clipboard.writeText(`${title}\n\n${body}`);
+    showToast('Post copied to clipboard!', 'success');
+}
+
+async function recordTransaction() {
+    const item = document.getElementById('txItem').value;
+    const price = parseInt(document.getElementById('txPrice').value);
+    const platform = document.getElementById('txPlatform').value;
+    const type = document.getElementById('txType').value;
+
+    if (!item || !price) {
+        showToast('Fill in item and price.', 'warning');
+        return;
+    }
+
+    const endpoint = type === 'sale' ? '/api/trade/record-sale' : '/api/trade/record-purchase';
+    await fetch(endpoint, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({item, price_fg: price, platform})
+    });
+
+    showToast(`${type === 'sale' ? 'Sale' : 'Purchase'} recorded!`, 'success');
+    setTimeout(() => location.reload(), 500);
+}
+
+// Pre-fill from URL params
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('item')) {
+        addTradeItem(params.get('item'));
+    } else {
+        addTradeItem();
+    }
+});
+</script>
+{% endblock %}
