@@ -2,16 +2,21 @@
 {% block title %}D2R Assistant - Price Guide{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <h1 class="page-title">Price Guide</h1>
+    <p class="page-subtitle">Current FG prices, HR rates, and currency conversion.</p>
+</div>
+
 <div class="row">
     <!-- Price Guide -->
     <div class="col-lg-8">
         <div class="d2r-card">
-            <div class="d2r-card-header d-flex justify-content-between">
-                <span><i class="bi bi-currency-exchange"></i> Price Guide</span>
-                <div>
-                    <input type="text" class="form-control form-control-sm d-inline-block" style="width:200px"
+            <div class="d2r-card-header">
+                <i class="bi bi-graph-up-arrow"></i> Price Guide
+                <div class="header-actions">
+                    <input type="text" class="form-control form-control-sm" style="width:180px"
                            id="priceFilter" placeholder="Filter items..." oninput="filterPrices()">
-                    <select class="form-select form-select-sm d-inline-block" style="width:120px"
+                    <select class="form-select form-select-sm" style="width:120px"
                             id="categoryFilter" onchange="filterPrices()">
                         <option value="">All</option>
                         <option value="rune">Runes</option>
@@ -49,7 +54,7 @@
                             <td class="price-fg">{{ data.fg_high }}</td>
                             <td class="price-fg">{{ data.fg_mid }}</td>
                             <td class="price-hr">{{ data.hr_equivalent }}</td>
-                            <td class="text-muted small">{{ data.get('note', '') }}</td>
+                            <td style="color:var(--text-muted); font-size:0.78rem;">{{ data.get('note', '') }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -63,7 +68,7 @@
         <!-- HR Rates -->
         <div class="d2r-card">
             <div class="d2r-card-header"><i class="bi bi-gem"></i> Rune Values (FG)</div>
-            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
                 <table class="table table-dark table-sm">
                     <thead><tr><th>Rune</th><th>FG Value</th></tr></thead>
                     <tbody>
@@ -80,19 +85,19 @@
 
         <!-- Converter -->
         <div class="d2r-card">
-            <div class="d2r-card-header"><i class="bi bi-arrow-left-right"></i> Currency Converter</div>
+            <div class="d2r-card-header"><i class="bi bi-currency-exchange"></i> Currency Converter</div>
 
             <div class="mb-3">
-                <label class="form-label small">FG to HR</label>
+                <label class="form-label">FG to HR</label>
                 <div class="input-group input-group-sm">
                     <input type="number" class="form-control" id="fgToHrInput" placeholder="FG amount">
-                    <button class="btn btn-outline-warning" onclick="convertFg()">Convert</button>
+                    <button class="btn btn-ghost-gold" onclick="convertFg()">Convert</button>
                 </div>
-                <div id="fgToHrResult" class="price-hr mt-1"></div>
+                <div id="fgToHrResult" class="converter-result price-hr mt-1"></div>
             </div>
 
             <div class="mb-3">
-                <label class="form-label small">HR to FG</label>
+                <label class="form-label">HR to FG</label>
                 <div class="input-group input-group-sm">
                     <select class="form-select" id="hrToFgRune">
                         {% for rune in hr_rates %}
@@ -100,9 +105,9 @@
                         {% endfor %}
                     </select>
                     <input type="number" class="form-control" id="hrToFgQty" value="1" min="1">
-                    <button class="btn btn-outline-warning" onclick="convertHr()">Convert</button>
+                    <button class="btn btn-ghost-gold" onclick="convertHr()">Convert</button>
                 </div>
-                <div id="hrToFgResult" class="price-fg mt-1"></div>
+                <div id="hrToFgResult" class="converter-result price-fg mt-1"></div>
             </div>
         </div>
 
@@ -111,7 +116,7 @@
             <div class="d2r-card-header"><i class="bi bi-tag"></i> Quick Price Check</div>
             <div class="input-group input-group-sm mb-2">
                 <input type="text" class="form-control" id="quickPriceInput" placeholder="Item name">
-                <button class="btn btn-outline-warning" onclick="quickPrice()">Check</button>
+                <button class="btn btn-ghost-gold" onclick="quickPrice()">Check</button>
             </div>
             <div id="quickPriceResult"></div>
         </div>
@@ -184,13 +189,13 @@ async function quickPrice() {
 
     if (data.fg_estimated) {
         container.innerHTML = `
-            <div class="price-fg">${data.fg_estimated} FG</div>
+            <div class="price-fg" style="font-size:1.1rem;">${data.fg_estimated} FG</div>
             <div class="price-range">${data.fg_low} - ${data.fg_high} FG</div>
             <div class="price-hr">${data.hr_equivalent}</div>
-            ${data.note ? `<div class="text-muted small">${data.note}</div>` : ''}
+            ${data.note ? `<div style="color:var(--text-muted); font-size:0.78rem; margin-top:0.25rem;">${data.note}</div>` : ''}
         `;
     } else {
-        container.innerHTML = '<div class="text-muted">Not found in price guide.</div>';
+        container.innerHTML = '<div style="color:var(--text-muted);">Not found in price guide.</div>';
     }
 }
 </script>

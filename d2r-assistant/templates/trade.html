@@ -2,11 +2,16 @@
 {% block title %}D2R Assistant - Trade{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <h1 class="page-title">Trade Center</h1>
+    <p class="page-subtitle">Generate trade posts, record transactions, and track your trading history.</p>
+</div>
+
 <div class="row">
     <!-- Trade Post Generator -->
     <div class="col-lg-7">
         <div class="d2r-card">
-            <div class="d2r-card-header"><i class="bi bi-shop"></i> Trade Post Generator</div>
+            <div class="d2r-card-header"><i class="bi bi-arrow-left-right"></i> Trade Post Generator</div>
 
             <div class="row mb-3">
                 <div class="col">
@@ -28,29 +33,31 @@
             <div id="tradeItems">
                 <label class="form-label d-flex justify-content-between">
                     <span>Items</span>
-                    <button class="btn btn-sm btn-outline-warning" onclick="addTradeItem()">+ Add Item</button>
+                    <button class="btn btn-sm btn-ghost-gold" onclick="addTradeItem()">+ Add Item</button>
                 </label>
                 <div id="tradeItemList"></div>
             </div>
 
-            <button class="btn btn-warning w-100 mt-3" onclick="generateTradePost()">
+            <button class="btn btn-d2r w-100 mt-3" onclick="generateTradePost()">
                 <i class="bi bi-file-text"></i> Generate Post
             </button>
         </div>
 
         <!-- Generated Post Preview -->
         <div class="d2r-card" id="postPreview" style="display:none;">
-            <div class="d2r-card-header d-flex justify-content-between">
-                <span><i class="bi bi-eye"></i> Post Preview</span>
-                <button class="btn btn-sm btn-outline-success btn-copy" onclick="copyPost()">
-                    <i class="bi bi-clipboard"></i> Copy
-                </button>
+            <div class="d2r-card-header">
+                <i class="bi bi-eye"></i> Post Preview
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-ghost-gold btn-copy" onclick="copyPost()">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                </div>
             </div>
             <div id="postTitle" class="mb-2 quality-unique fw-bold"></div>
             <div class="trade-preview" id="postBody"></div>
         </div>
 
-        <!-- Record Sale/Purchase -->
+        <!-- Record Transaction -->
         <div class="d2r-card">
             <div class="d2r-card-header"><i class="bi bi-receipt"></i> Record Transaction</div>
             <div class="row g-2">
@@ -73,7 +80,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-sm btn-warning w-100" onclick="recordTransaction()">Record</button>
+                    <button class="btn btn-sm btn-d2r w-100" onclick="recordTransaction()">Record</button>
                 </div>
             </div>
         </div>
@@ -83,7 +90,7 @@
     <div class="col-lg-5">
         <!-- Summary -->
         <div class="d2r-card">
-            <div class="d2r-card-header"><i class="bi bi-graph-up"></i> Trade Summary</div>
+            <div class="d2r-card-header"><i class="bi bi-bar-chart-line"></i> Trade Summary</div>
             <div class="row g-2 text-center">
                 <div class="col-4">
                     <div class="stat-value" style="font-size:1.4rem">{{ summary.total_sales }}</div>
@@ -94,7 +101,7 @@
                     <div class="stat-label">Purchases</div>
                 </div>
                 <div class="col-4">
-                    <div class="stat-value" style="font-size:1.4rem; color: {{ '#00ff00' if summary.net_fg >= 0 else '#ff4444' }}">
+                    <div class="stat-value" style="font-size:1.4rem; color: {{ 'var(--accent-green)' if summary.net_fg >= 0 else 'var(--accent-red)' }}">
                         {{ summary.net_fg }} FG
                     </div>
                     <div class="stat-label">Net FG</div>
@@ -103,11 +110,11 @@
 
             <div class="row mt-3">
                 <div class="col-6">
-                    <div class="small text-muted">Total Sold</div>
+                    <div style="font-size:0.78rem; color:var(--text-muted);">Total Sold</div>
                     <div class="price-fg">{{ summary.total_sold_fg }} FG</div>
                 </div>
                 <div class="col-6">
-                    <div class="small text-muted">Total Bought</div>
+                    <div style="font-size:0.78rem; color:var(--text-muted);">Total Bought</div>
                     <div class="price-fg">{{ summary.total_bought_fg }} FG</div>
                 </div>
             </div>
@@ -119,18 +126,18 @@
             {% if history %}
             {% for post in history | reverse %}
             <div class="inventory-item mb-2">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center">
                     <span class="badge bg-{{ 'success' if post.mode == 'ft' else 'info' }}">{{ post.mode|upper }}</span>
                     <span class="badge bg-secondary">{{ post.platform }}</span>
                 </div>
-                <div class="small mt-1">
+                <div style="font-size:0.82rem; margin-top:4px;">
                     {{ post.items | join(', ') | truncate(80) }}
                 </div>
-                <div class="text-muted" style="font-size:0.7rem">{{ post.created_at[:16] }}</div>
+                <div style="color:var(--text-muted); font-size:0.7rem;">{{ post.created_at[:16] }}</div>
             </div>
             {% endfor %}
             {% else %}
-            <div class="text-muted small">No trade posts yet.</div>
+            <div style="color:var(--text-muted); font-size:0.82rem;">No trade posts yet.</div>
             {% endif %}
         </div>
 
@@ -140,7 +147,7 @@
             <div class="d2r-card-header"><i class="bi bi-cash-stack"></i> Recent Sales</div>
             {% for sale in summary.recent_sales | reverse %}
             <div class="d-flex justify-content-between mb-2">
-                <span>{{ sale.item }}</span>
+                <span style="font-size:0.85rem;">{{ sale.item }}</span>
                 <span class="price-fg">{{ sale.price_fg }} FG</span>
             </div>
             {% endfor %}
@@ -161,7 +168,7 @@ function addTradeItem(name, specs) {
     div.className = 'inventory-item mb-2';
     div.id = `trade-item-${id}`;
     div.innerHTML = `
-        <div class="row g-2">
+        <div class="row g-2 align-items-center">
             <div class="col-5">
                 <input type="text" class="form-control form-control-sm" placeholder="Item name"
                        data-field="name" value="${name || ''}">
@@ -173,11 +180,13 @@ function addTradeItem(name, specs) {
             <div class="col-2">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" data-field="ethereal">
-                    <label class="form-check-label small">Eth</label>
+                    <label class="form-check-label" style="font-size:0.78rem">Eth</label>
                 </div>
             </div>
             <div class="col-1">
-                <button class="btn btn-sm btn-outline-danger" onclick="document.getElementById('trade-item-${id}').remove()">x</button>
+                <button class="btn-icon danger" onclick="document.getElementById('trade-item-${id}').remove()">
+                    <i class="bi bi-x" style="font-size:0.8rem"></i>
+                </button>
             </div>
         </div>
     `;
@@ -233,6 +242,7 @@ async function generateTradePost() {
     }
 
     showToast('Trade post generated!', 'success');
+    preview.scrollIntoView({behavior: 'smooth'});
 }
 
 function copyPost() {

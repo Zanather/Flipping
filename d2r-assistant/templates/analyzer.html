@@ -2,11 +2,15 @@
 {% block title %}D2R Assistant - Item Analyzer{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <h1 class="page-title">Item Analyzer</h1>
+    <p class="page-subtitle">Check roll quality, value ranges, and pricing for your items.</p>
+</div>
+
 <div class="row">
     <div class="col-lg-6">
         <div class="d2r-card">
-            <div class="d2r-card-header"><i class="bi bi-search"></i> Item Analyzer</div>
-            <p class="text-muted small">Enter an item's stats to see roll quality, value ranges, and pricing.</p>
+            <div class="d2r-card-header"><i class="bi bi-search-heart"></i> Analyze Item</div>
 
             <div class="item-form">
                 <div class="mb-3">
@@ -43,15 +47,15 @@
                 <div class="mb-3">
                     <label class="form-label d-flex justify-content-between">
                         <span>Modifiers</span>
-                        <button class="btn btn-sm btn-outline-info" onclick="addAnalyzeMod()">+ Add Mod</button>
+                        <button class="btn btn-sm btn-ghost-gold" onclick="addAnalyzeMod()">+ Add Mod</button>
                     </label>
                     <div id="analyzeModInputs"></div>
-                    <button class="btn btn-sm btn-outline-secondary mt-2" onclick="loadKnownMods()">
-                        <i class="bi bi-magic"></i> Auto-fill mods from database
+                    <button class="btn btn-sm btn-ghost mt-2" onclick="loadKnownMods()">
+                        <i class="bi bi-magic"></i> Auto-fill from database
                     </button>
                 </div>
 
-                <button class="btn btn-warning w-100" onclick="analyzeItem()">
+                <button class="btn btn-d2r w-100" onclick="analyzeItem()">
                     <i class="bi bi-search"></i> Analyze Item
                 </button>
             </div>
@@ -62,7 +66,7 @@
             <div class="d2r-card-header"><i class="bi bi-lightning"></i> Quick Lookup</div>
             <div class="input-group mb-2">
                 <input type="text" class="form-control" id="quickLookup" placeholder="Search runewords, uniques, bases...">
-                <button class="btn btn-outline-warning" onclick="quickLookup()">Search</button>
+                <button class="btn btn-ghost-gold" onclick="quickLookup()">Search</button>
             </div>
             <div id="quickResults"></div>
         </div>
@@ -71,26 +75,23 @@
     <!-- Analysis Results -->
     <div class="col-lg-6">
         <div class="d2r-card" id="analysisResults" style="display:none;">
-            <div class="d2r-card-header d-flex justify-content-between">
-                <span><i class="bi bi-clipboard-data"></i> Analysis Results</span>
-                <span id="overallQualityBadge"></span>
+            <div class="d2r-card-header">
+                <i class="bi bi-clipboard-data"></i> Analysis Results
+                <div class="header-actions">
+                    <span id="overallQualityBadge"></span>
+                </div>
             </div>
 
             <div id="itemHeader" class="mb-3"></div>
-
-            <!-- Mod Analysis -->
             <div id="modAnalysis" class="mb-3"></div>
-
-            <!-- Price Info -->
             <div id="priceInfo" class="mb-3"></div>
 
-            <!-- Actions -->
             <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-success" onclick="generateTradePitch()">
+                <button class="btn btn-sm btn-ghost-gold" onclick="generateTradePitch()">
                     <i class="bi bi-megaphone"></i> Sales Pitch
                 </button>
-                <button class="btn btn-sm btn-outline-info" onclick="sendToTrade()">
-                    <i class="bi bi-shop"></i> Create Trade Post
+                <button class="btn btn-sm btn-ghost" onclick="sendToTrade()">
+                    <i class="bi bi-arrow-left-right"></i> Create Trade Post
                 </button>
             </div>
         </div>
@@ -99,8 +100,8 @@
         <div class="d2r-card">
             <div class="d2r-card-header"><i class="bi bi-gem"></i> Runeword Browser</div>
             <div class="row g-2" id="runewordBrowser">
-                <div class="text-center text-muted py-2">
-                    <small>Loading runewords...</small>
+                <div class="text-center py-3">
+                    <div class="skeleton" style="height:20px; width:150px; margin:0 auto;"></div>
                 </div>
             </div>
         </div>
@@ -110,14 +111,14 @@
 <!-- Sales Pitch Modal -->
 <div class="modal fade" id="pitchModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-dark">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title">Sales Pitch</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-megaphone" style="color:var(--d2r-gold)"></i> Sales Pitch</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="trade-preview" id="pitchContent"></div>
-                <button class="btn btn-sm btn-outline-success mt-2 btn-copy" onclick="copyPitch()">
+                <button class="btn btn-sm btn-ghost-gold mt-3 btn-copy" onclick="copyPitch()">
                     <i class="bi bi-clipboard"></i> Copy to Clipboard
                 </button>
             </div>
@@ -141,7 +142,9 @@ function addAnalyzeMod(name, value) {
     row.innerHTML = `
         <input type="text" class="form-control form-control-sm" placeholder="Mod name (e.g. +All Resistances)" value="${name || ''}">
         <input type="number" class="form-control form-control-sm" style="max-width:80px" placeholder="Value" value="${value || ''}">
-        <button class="btn btn-sm btn-outline-danger btn-remove" onclick="document.getElementById('amod-${id}').remove()">x</button>
+        <button class="btn-icon danger" style="width:28px;height:28px;" onclick="document.getElementById('amod-${id}').remove()">
+            <i class="bi bi-x" style="font-size:0.8rem"></i>
+        </button>
     `;
     container.appendChild(row);
 }
@@ -172,7 +175,6 @@ async function analyzeItem() {
         return;
     }
 
-    // Analyze and price in parallel
     const [analysisRes, priceRes] = await Promise.all([
         fetch('/api/analyze', {
             method: 'POST',
@@ -184,7 +186,6 @@ async function analyzeItem() {
 
     currentAnalysis = await analysisRes.json();
     currentPrice = await priceRes.json();
-
     displayAnalysis(currentAnalysis, currentPrice);
 }
 
@@ -192,59 +193,57 @@ function displayAnalysis(analysis, price) {
     const container = document.getElementById('analysisResults');
     container.style.display = 'block';
 
-    // Header
     const header = document.getElementById('itemHeader');
     const ethTag = analysis.ethereal ? '<span class="quality-eth">ETH</span> ' : '';
-    const tierBadge = analysis.tier ? `<span class="tier-badge tier-${analysis.tier.toLowerCase()}">${analysis.tier}</span>` : '';
+    const tierBadge = analysis.tier ? `<span class="tier-badge tier-${analysis.tier.toLowerCase()} ms-2">${analysis.tier}</span>` : '';
 
     header.innerHTML = `
-        <h5>${ethTag}<span class="quality-unique">${analysis.name}</span> ${tierBadge}</h5>
-        <div class="text-muted small">Type: ${analysis.type}</div>
+        <h5 style="margin:0;">${ethTag}<span class="quality-unique">${analysis.name}</span> ${tierBadge}</h5>
+        <div style="color:var(--text-secondary); font-size:0.82rem; margin-top:0.25rem;">Type: ${analysis.type}</div>
     `;
 
-    // Overall quality
     const badge = document.getElementById('overallQualityBadge');
     if (analysis.overall_quality_pct != null) {
         const color = getQualityColor(analysis.overall_quality_pct);
-        badge.innerHTML = `<span style="color:${color}; font-weight:bold;">${analysis.overall_quality_pct}% (${analysis.overall_quality})</span>`;
+        badge.innerHTML = `<span style="color:${color}; font-weight:700; font-size:0.88rem;">${analysis.overall_quality_pct}% ${analysis.overall_quality}</span>`;
     } else {
-        badge.innerHTML = `<span class="text-muted">${analysis.overall_quality}</span>`;
+        badge.innerHTML = `<span style="color:var(--text-secondary)">${analysis.overall_quality}</span>`;
     }
 
-    // Mod analysis
     const modDiv = document.getElementById('modAnalysis');
     if (analysis.mod_analysis && analysis.mod_analysis.length > 0) {
-        let html = '<h6 class="text-muted">Modifier Analysis</h6>';
+        let html = '<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">Modifier Analysis</h6>';
         for (const mod of analysis.mod_analysis) {
             html += renderModRow(mod);
         }
         modDiv.innerHTML = html;
     } else {
-        modDiv.innerHTML = '<p class="text-muted">No modifier data available for this item.</p>';
+        modDiv.innerHTML = '<p style="color:var(--text-secondary); font-size:0.85rem;">No modifier data available for this item.</p>';
     }
 
-    // Price info
     const priceDiv = document.getElementById('priceInfo');
     if (price && price.fg_estimated) {
         priceDiv.innerHTML = `
-            <h6 class="text-muted">Pricing</h6>
-            <div class="d-flex justify-content-between">
-                <span>Estimated Value:</span>
+            <h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">Pricing</h6>
+            <div class="d-flex justify-content-between mb-1">
+                <span style="color:var(--text-secondary)">Estimated Value</span>
                 <span class="price-fg">${price.fg_estimated} FG</span>
             </div>
-            <div class="d-flex justify-content-between">
-                <span>Range:</span>
+            <div class="d-flex justify-content-between mb-1">
+                <span style="color:var(--text-secondary)">Range</span>
                 <span class="price-range">${price.fg_low} - ${price.fg_high} FG</span>
             </div>
-            <div class="d-flex justify-content-between">
-                <span>HR Equivalent:</span>
+            <div class="d-flex justify-content-between mb-1">
+                <span style="color:var(--text-secondary)">HR Equivalent</span>
                 <span class="price-hr">${price.hr_equivalent}</span>
             </div>
-            ${price.note ? `<div class="text-muted small mt-1"><i class="bi bi-info-circle"></i> ${price.note}</div>` : ''}
+            ${price.note ? `<div style="color:var(--text-muted); font-size:0.78rem;" class="mt-1"><i class="bi bi-info-circle"></i> ${price.note}</div>` : ''}
         `;
     } else {
-        priceDiv.innerHTML = '<p class="text-muted small">No pricing data available. Check D2JSP or Traderie.</p>';
+        priceDiv.innerHTML = '<p style="color:var(--text-secondary); font-size:0.82rem;">No pricing data available.</p>';
     }
+
+    container.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 
 function renderModRow(mod) {
@@ -261,9 +260,9 @@ function renderModRow(mod) {
             </div>
         `;
     } else if (!mod.variable) {
-        qualityHtml = '<div class="mod-quality text-muted">fixed</div><div style="width:80px"></div>';
+        qualityHtml = '<div class="mod-quality" style="color:var(--text-muted)">fixed</div><div style="width:80px"></div>';
     } else {
-        qualityHtml = `<div class="mod-quality text-muted">${mod.quality_label || '-'}</div><div style="width:80px"></div>`;
+        qualityHtml = `<div class="mod-quality" style="color:var(--text-muted)">${mod.quality_label || '-'}</div><div style="width:80px"></div>`;
     }
 
     const rangeStr = (mod.min != null && mod.max != null) ? `[${mod.min}-${mod.max}]` : '';
@@ -280,12 +279,12 @@ function renderModRow(mod) {
 }
 
 function getQualityColor(pct) {
-    if (pct >= 95) return '#FFD700';
-    if (pct >= 80) return '#00FF00';
-    if (pct >= 60) return '#90EE90';
-    if (pct >= 40) return '#FFFF00';
-    if (pct >= 20) return '#FFA500';
-    return '#FF4444';
+    if (pct >= 95) return 'var(--quality-perfect)';
+    if (pct >= 80) return 'var(--quality-high)';
+    if (pct >= 60) return 'var(--quality-above)';
+    if (pct >= 40) return 'var(--quality-avg)';
+    if (pct >= 20) return 'var(--quality-below)';
+    return 'var(--quality-low)';
 }
 
 function getBarClass(pct) {
@@ -299,10 +298,7 @@ function getBarClass(pct) {
 
 async function loadKnownMods() {
     const name = document.getElementById('analyzeItemName').value;
-    if (!name) {
-        showToast('Enter an item name first', 'warning');
-        return;
-    }
+    if (!name) { showToast('Enter an item name first', 'warning'); return; }
 
     const res = await fetch('/api/search?q=' + encodeURIComponent(name));
     const data = await res.json();
@@ -330,18 +326,20 @@ async function quickLookup() {
     const results = data.database_matches || [];
 
     if (results.length === 0) {
-        container.innerHTML = '<div class="text-muted small">No results found.</div>';
+        container.innerHTML = '<div style="color:var(--text-muted); font-size:0.82rem;">No results found.</div>';
         return;
     }
 
     container.innerHTML = results.slice(0, 10).map(r => `
         <div class="inventory-item mb-2" onclick="document.getElementById('analyzeItemName').value='${r.name}'">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between align-items-center">
                 <strong class="quality-unique">${r.name}</strong>
-                <small class="text-muted">${r.category}</small>
+                <div class="d-flex align-items-center gap-2">
+                    ${r.data.tier ? `<span class="tier-badge tier-${r.data.tier.toLowerCase()}">${r.data.tier}</span>` : ''}
+                    <span class="badge bg-secondary">${r.category}</span>
+                </div>
             </div>
-            ${r.data.tier ? `<span class="tier-badge tier-${r.data.tier.toLowerCase()}">${r.data.tier}</span>` : ''}
-            ${r.data.est_fg ? `<span class="price-range ms-2">${r.data.est_fg} FG</span>` : ''}
+            ${r.data.est_fg ? `<div class="price-range mt-1">${r.data.est_fg} FG</div>` : ''}
         </div>
     `).join('');
 }
@@ -379,7 +377,6 @@ function sendToTrade() {
     window.location.href = `/trade?item=${encodeURIComponent(name)}`;
 }
 
-// Load runeword browser
 async function loadRunewords() {
     const res = await fetch('/api/runewords');
     const data = await res.json();
@@ -388,18 +385,17 @@ async function loadRunewords() {
     container.innerHTML = Object.entries(data).map(([name, rw]) => `
         <div class="col-md-6">
             <div class="inventory-item" onclick="document.getElementById('analyzeItemName').value='${name}'; document.getElementById('analyzeItemType').value='runeword';">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center">
                     <strong class="quality-runeword">${name}</strong>
                     ${rw.tier ? `<span class="tier-badge tier-${rw.tier.toLowerCase()}">${rw.tier}</span>` : ''}
                 </div>
-                <div class="small text-muted">${rw.runes.join(' + ')}</div>
-                <div class="small text-muted">${rw.bases.join(', ')}</div>
+                <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:4px;">${rw.runes.join(' + ')}</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">${rw.bases.join(', ')}</div>
             </div>
         </div>
     `).join('');
 }
 
-// Check URL params for pre-fill
 document.addEventListener('DOMContentLoaded', () => {
     loadRunewords();
     const params = new URLSearchParams(window.location.search);

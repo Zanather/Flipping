@@ -4,78 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}D2R Inventory Assistant{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
-        <div class="container-fluid">
-            <a class="navbar-brand d2r-brand" href="/">
-                <i class="bi bi-gem"></i> D2R Assistant
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <button class="mobile-toggle" onclick="toggleSidebar()">
+            <i class="bi bi-list"></i>
+        </button>
+        <span class="mobile-brand"><i class="bi bi-gem"></i> D2R Assistant</span>
+    </div>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <a href="/" class="sidebar-brand">
+                <i class="bi bi-gem"></i>
+                D2R Assistant
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
-                            <i class="bi bi-backpack"></i> Inventory
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/analyzer' %}active{% endif %}" href="/analyzer">
-                            <i class="bi bi-search"></i> Analyzer
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/prices' %}active{% endif %}" href="/prices">
-                            <i class="bi bi-currency-exchange"></i> Prices
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/trade' %}active{% endif %}" href="/trade">
-                            <i class="bi bi-shop"></i> Trade
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/guides' %}active{% endif %}" href="/guides">
-                            <i class="bi bi-book"></i> Guides
-                        </a>
-                    </li>
-                </ul>
-                <div class="ms-auto">
-                    <form class="d-flex" id="globalSearch" onsubmit="globalSearch(event)">
-                        <input class="form-control form-control-sm me-2" type="search" id="globalSearchInput"
-                               placeholder="Search items..." aria-label="Search">
-                        <button class="btn btn-outline-warning btn-sm" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </form>
-                </div>
+
+            <div class="sidebar-search">
+                <form onsubmit="globalSearch(event)">
+                    <div class="sidebar-search-wrap">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="sidebar-search-input" id="globalSearchInput"
+                               placeholder="Search items..." autocomplete="off">
+                        <span class="sidebar-kbd">Ctrl+K</span>
+                    </div>
+                </form>
             </div>
-        </div>
-    </nav>
 
-    <main class="container-fluid py-3">
-        {% block content %}{% endblock %}
-    </main>
+            <nav class="sidebar-nav">
+                <a href="/" class="sidebar-link {% if request.path == '/' %}active{% endif %}">
+                    <i class="bi bi-grid-1x2"></i>
+                    Dashboard
+                </a>
+                <a href="/analyzer" class="sidebar-link {% if request.path == '/analyzer' %}active{% endif %}">
+                    <i class="bi bi-search-heart"></i>
+                    Analyzer
+                </a>
+                <a href="/prices" class="sidebar-link {% if request.path == '/prices' %}active{% endif %}">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    Prices
+                </a>
+                <a href="/trade" class="sidebar-link {% if request.path == '/trade' %}active{% endif %}">
+                    <i class="bi bi-arrow-left-right"></i>
+                    Trade
+                </a>
+                <a href="/guides" class="sidebar-link {% if request.path == '/guides' %}active{% endif %}">
+                    <i class="bi bi-journal-bookmark"></i>
+                    Guides
+                </a>
+            </nav>
 
-    <footer class="text-center text-muted py-3 border-top border-secondary mt-4">
-        <small>D2R Inventory Assistant v1.0 | Not affiliated with Blizzard Entertainment</small>
-    </footer>
+            <div class="sidebar-footer">
+                D2R Assistant v1.0<br>
+                Not affiliated with Blizzard
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 
     <!-- Global Search Results Modal -->
     <div class="modal fade" id="searchModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content bg-dark">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title">Search Results</h5>
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-search"></i> Search Results</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="searchResults">
-                </div>
+                <div class="modal-body" id="searchResults"></div>
             </div>
         </div>
     </div>

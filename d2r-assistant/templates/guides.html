@@ -2,11 +2,16 @@
 {% block title %}D2R Assistant - Guides & Tools{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <h1 class="page-title">Guides & Tools</h1>
+    <p class="page-subtitle">Build guides, breakpoint calculator, cube recipes, and valuable item watchlist.</p>
+</div>
+
 <div class="row">
     <!-- Build Guides -->
     <div class="col-lg-8">
         <div class="d2r-card">
-            <div class="d2r-card-header"><i class="bi bi-book"></i> Build Guides</div>
+            <div class="d2r-card-header"><i class="bi bi-journal-bookmark"></i> Build Guides</div>
             <div class="row g-3">
                 {% for build in builds %}
                 <div class="col-md-6">
@@ -14,12 +19,12 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <strong class="quality-unique">{{ build.name }}</strong>
-                                <div class="small text-muted">{{ build.class }} - {{ build.type }}</div>
+                                <div style="font-size:0.78rem; color:var(--text-secondary);">{{ build.class }} - {{ build.type }}</div>
                             </div>
                             <span class="tier-badge tier-{{ build.tier|lower }}">{{ build.tier }}</span>
                         </div>
-                        <div class="small mt-2">{{ build.description | truncate(100) }}</div>
-                        <div class="mt-1">
+                        <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.5rem;">{{ build.description | truncate(100) }}</div>
+                        <div class="mt-2">
                             <span class="badge bg-secondary">{{ build.difficulty }}</span>
                         </div>
                     </div>
@@ -30,9 +35,13 @@
 
         <!-- Build Detail -->
         <div class="d2r-card" id="buildDetail" style="display:none;">
-            <div class="d2r-card-header d-flex justify-content-between">
+            <div class="d2r-card-header">
                 <span id="buildDetailName"></span>
-                <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('buildDetail').style.display='none'">Close</button>
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-ghost" onclick="document.getElementById('buildDetail').style.display='none'">
+                        <i class="bi bi-x-lg"></i> Close
+                    </button>
+                </div>
             </div>
             <div id="buildDetailContent"></div>
         </div>
@@ -41,18 +50,18 @@
         <div class="d2r-card">
             <div class="d2r-card-header"><i class="bi bi-eye"></i> Valuable Items Watchlist</div>
 
-            <h6 class="quality-set mt-3">Always Pick Up</h6>
+            <h6 class="quality-set mt-3" style="font-size:0.82rem;">Always Pick Up</h6>
             {% for category, data in watchlist.always_pick_up.items() %}
             <div class="mb-3">
-                <strong class="text-muted">{{ category | title }}</strong>
-                <div class="small text-muted mb-1">{{ data.description }}</div>
+                <strong style="color:var(--text-secondary); font-size:0.82rem;">{{ category | title }}</strong>
+                <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.25rem;">{{ data.description }}</div>
                 {% for item in data.items %}
                 <div class="watchlist-item">{{ item }}</div>
                 {% endfor %}
             </div>
             {% endfor %}
 
-            <h6 class="quality-rare mt-4">Check Rolls (Common but Potentially Valuable)</h6>
+            <h6 class="quality-rare mt-4" style="font-size:0.82rem;">Check Rolls (Common but Potentially Valuable)</h6>
             <div class="table-responsive">
                 <table class="table table-dark table-sm">
                     <thead>
@@ -62,7 +71,7 @@
                         {% for item in watchlist.check_rolls.items %}
                         <tr>
                             <td class="quality-unique">{{ item.name }}</td>
-                            <td class="text-muted">{{ item.check }}</td>
+                            <td style="color:var(--text-secondary)">{{ item.check }}</td>
                             <td class="quality-set">{{ item.valuable_if }}</td>
                         </tr>
                         {% endfor %}
@@ -90,7 +99,7 @@
                 </select>
             </div>
             <div class="mb-2">
-                <label class="form-label small">Your FCR</label>
+                <label class="form-label">Your FCR</label>
                 <input type="number" class="form-control form-control-sm" id="bpFcr" value="0"
                        onchange="checkBreakpoint()">
             </div>
@@ -102,7 +111,9 @@
         <div class="d2r-card">
             <div class="d2r-card-header"><i class="bi bi-box"></i> Useful Cube Recipes</div>
             <div id="cubeRecipes" style="max-height:400px; overflow-y:auto;">
-                <div class="text-center text-muted py-2"><small>Loading...</small></div>
+                <div class="text-center py-3">
+                    <div class="skeleton" style="height:16px; width:130px; margin:0 auto;"></div>
+                </div>
             </div>
         </div>
 
@@ -110,7 +121,7 @@
         <div class="d2r-card">
             <div class="d2r-card-header"><i class="bi bi-gem"></i> Rune Upgrade Calculator</div>
             <div class="mb-2">
-                <label class="form-label small">Target Rune</label>
+                <label class="form-label">Target Rune</label>
                 <select class="form-select form-select-sm" id="runeTarget">
                     <option value="Ber">Ber</option>
                     <option value="Jah">Jah</option>
@@ -126,7 +137,7 @@
                 </select>
             </div>
             <div class="mb-2">
-                <label class="form-label small">Starting From</label>
+                <label class="form-label">Starting From</label>
                 <select class="form-select form-select-sm" id="runeStart">
                     <option value="El">El</option>
                     <option value="Ral">Ral</option>
@@ -143,7 +154,7 @@
                     <option value="Pul">Pul</option>
                 </select>
             </div>
-            <button class="btn btn-sm btn-warning w-100" onclick="calcRuneUpgrade()">Calculate</button>
+            <button class="btn btn-sm btn-d2r w-100" onclick="calcRuneUpgrade()">Calculate</button>
             <div id="runeCalcResult" class="mt-2"></div>
         </div>
     </div>
@@ -167,10 +178,10 @@ async function loadBuildGuide(name) {
         <span class="tier-badge tier-${build.tier.toLowerCase()} ms-2">${build.tier}</span>
     `;
 
-    let html = `<p>${build.description}</p>`;
+    let html = `<p style="color:var(--text-secondary); font-size:0.88rem;">${build.description}</p>`;
 
     // Skills
-    html += '<h6 class="text-muted mt-3">Skill Points</h6>';
+    html += '<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; margin-top:1rem;">Skill Points</h6>';
     for (const [skill, points] of Object.entries(build.skills)) {
         const width = (points / 20) * 100;
         html += `
@@ -185,42 +196,42 @@ async function loadBuildGuide(name) {
     }
 
     // Gear
-    html += '<h6 class="text-muted mt-3">Recommended Gear</h6>';
+    html += '<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; margin-top:1rem;">Recommended Gear</h6>';
     html += '<table class="table table-dark table-sm"><thead><tr><th>Slot</th><th>Best</th><th>Budget</th></tr></thead><tbody>';
     for (const [slot, gear] of Object.entries(build.gear)) {
         html += `<tr>
-            <td>${slot}</td>
-            <td class="quality-unique">${gear.best}</td>
-            <td class="quality-magic">${gear.budget}</td>
+            <td style="font-size:0.82rem;">${slot}</td>
+            <td class="quality-unique" style="font-size:0.82rem;">${gear.best}</td>
+            <td class="quality-magic" style="font-size:0.82rem;">${gear.budget}</td>
         </tr>`;
     }
     html += '</tbody></table>';
 
     // Merc
-    html += '<h6 class="text-muted mt-3">Mercenary</h6>';
-    html += `<div class="small">
-        <div><strong>Type:</strong> ${build.merc.type}</div>
-        <div><strong>Weapon:</strong> <span class="quality-runeword">${build.merc.weapon}</span></div>
-        <div><strong>Armor:</strong> <span class="quality-runeword">${build.merc.armor}</span></div>
-        <div><strong>Helm:</strong> <span class="quality-unique">${build.merc.helm}</span></div>
+    html += '<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; margin-top:1rem;">Mercenary</h6>';
+    html += `<div style="font-size:0.82rem;">
+        <div><strong style="color:var(--text-secondary);">Type:</strong> ${build.merc.type}</div>
+        <div><strong style="color:var(--text-secondary);">Weapon:</strong> <span class="quality-runeword">${build.merc.weapon}</span></div>
+        <div><strong style="color:var(--text-secondary);">Armor:</strong> <span class="quality-runeword">${build.merc.armor}</span></div>
+        <div><strong style="color:var(--text-secondary);">Helm:</strong> <span class="quality-unique">${build.merc.helm}</span></div>
     </div>`;
 
     // Breakpoints
     if (build.breakpoints) {
-        html += '<h6 class="text-muted mt-3">Key Breakpoints</h6>';
+        html += '<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; margin-top:1rem;">Key Breakpoints</h6>';
         for (const [type, data] of Object.entries(build.breakpoints)) {
             if (data.frames) {
-                html += `<div class="small"><strong>${type}:</strong> ${data.frames.join(', ')} (target: ${data.target})</div>`;
+                html += `<div style="font-size:0.82rem;"><strong style="color:var(--text-secondary);">${type}:</strong> ${data.frames.join(', ')} (target: ${data.target})</div>`;
             } else if (data.note) {
-                html += `<div class="small"><strong>${type}:</strong> ${data.note}</div>`;
+                html += `<div style="font-size:0.82rem;"><strong style="color:var(--text-secondary);">${type}:</strong> ${data.note}</div>`;
             }
         }
     }
 
     // Farm spots
     if (build.farm_spots) {
-        html += '<h6 class="text-muted mt-3">Best Farm Spots</h6>';
-        html += build.farm_spots.map(s => `<span class="badge bg-secondary me-1">${s}</span>`).join('');
+        html += '<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; margin-top:1rem;">Best Farm Spots</h6>';
+        html += build.farm_spots.map(s => `<span class="badge bg-secondary me-1 mb-1">${s}</span>`).join('');
     }
 
     document.getElementById('buildDetailContent').innerHTML = html;
@@ -238,7 +249,7 @@ async function loadBreakpoints() {
     let html = '';
 
     for (const [type, bpData] of Object.entries(data)) {
-        html += `<h6 class="text-muted mt-2">${type}</h6>`;
+        html += `<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; margin-top:0.5rem;">${type}</h6>`;
         html += '<table class="table table-dark table-sm bp-table">';
         html += '<thead><tr><th>Requirement</th><th>Frames</th></tr></thead><tbody>';
 
@@ -264,7 +275,7 @@ async function checkBreakpoint() {
 
     if (data.error) return;
 
-    let html = `<div class="small">
+    let html = `<div style="font-size:0.82rem;">
         <div>Current: <strong>${data.current_frames}</strong> frames at ${data.current_fcr} FCR</div>
     `;
     if (data.next_breakpoint) {
@@ -282,15 +293,15 @@ async function loadCubeRecipes() {
     const data = await res.json();
     const container = document.getElementById('cubeRecipes');
 
-    let html = '<h6 class="text-muted">Useful Recipes</h6>';
+    let html = '<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">Useful Recipes</h6>';
     for (const [name, desc] of Object.entries(data.useful_recipes)) {
-        html += `<div class="watchlist-item"><strong>${name}</strong><br><small class="text-muted">${desc}</small></div>`;
+        html += `<div class="watchlist-item"><strong style="font-size:0.82rem;">${name}</strong><br><span style="color:var(--text-muted); font-size:0.78rem;">${desc}</span></div>`;
     }
 
-    html += '<h6 class="text-muted mt-3">Rune Upgrades (sample)</h6>';
+    html += '<h6 style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; margin-top:1rem;">Rune Upgrades</h6>';
     const upgrades = Object.entries(data.rune_upgrades).slice(-10);
     for (const [recipe, result] of upgrades) {
-        html += `<div class="watchlist-item small">${recipe} → <span class="quality-runeword">${result}</span></div>`;
+        html += `<div class="watchlist-item" style="font-size:0.82rem;">${recipe} <span style="color:var(--text-muted);">&rarr;</span> <span class="quality-runeword">${result}</span></div>`;
     }
 
     container.innerHTML = html;
@@ -303,12 +314,12 @@ async function calcRuneUpgrade() {
     const data = await res.json();
 
     if (data.error) {
-        document.getElementById('runeCalcResult').innerHTML = `<div class="text-danger small">${data.error}</div>`;
+        document.getElementById('runeCalcResult').innerHTML = `<div style="color:var(--accent-red); font-size:0.82rem;">${data.error}</div>`;
         return;
     }
 
     document.getElementById('runeCalcResult').innerHTML = `
-        <div class="small">
+        <div style="font-size:0.82rem;">
             <div>Need <strong class="quality-unique">${data.runes_needed.toLocaleString()}</strong> ${data.starting_rune} runes</div>
             <div>Target value: <span class="price-fg">${data.fg_value_target} FG</span></div>
         </div>

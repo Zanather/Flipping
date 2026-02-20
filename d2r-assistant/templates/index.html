@@ -1,88 +1,113 @@
 {% extends "base.html" %}
-{% block title %}D2R Assistant - Inventory{% endblock %}
+{% block title %}D2R Assistant - Dashboard{% endblock %}
 
 {% block content %}
-<div class="row">
-    <!-- Stats Overview -->
-    <div class="col-12 mb-3">
-        <div class="row g-3">
-            <div class="col-md-3 col-6">
-                <div class="d2r-card stat-card">
-                    <div class="stat-value">{{ tally.total_items }}</div>
-                    <div class="stat-label">Total Items</div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="d2r-card stat-card">
-                    <div class="stat-value">{{ characters|length }}</div>
-                    <div class="stat-label">Characters</div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="d2r-card stat-card">
-                    <div class="stat-value">{{ tally.shared_stash_count }}</div>
-                    <div class="stat-label">Shared Stash</div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="d2r-card stat-card">
-                    <div class="stat-value">{{ tally.by_quality|length }}</div>
-                    <div class="stat-label">Item Types</div>
-                </div>
-            </div>
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Manage your characters, stash, and inventory at a glance.</p>
+</div>
+
+<!-- Stats Overview -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-3 col-6">
+        <div class="d2r-card stat-card">
+            <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+            <div class="stat-value">{{ tally.total_items }}</div>
+            <div class="stat-label">Total Items</div>
         </div>
     </div>
+    <div class="col-lg-3 col-6">
+        <div class="d2r-card stat-card">
+            <div class="stat-icon"><i class="bi bi-people"></i></div>
+            <div class="stat-value">{{ characters|length }}</div>
+            <div class="stat-label">Characters</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="d2r-card stat-card">
+            <div class="stat-icon"><i class="bi bi-archive"></i></div>
+            <div class="stat-value">{{ tally.shared_stash_count }}</div>
+            <div class="stat-label">Shared Stash</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="d2r-card stat-card">
+            <div class="stat-icon"><i class="bi bi-layers"></i></div>
+            <div class="stat-value">{{ tally.by_quality|length }}</div>
+            <div class="stat-label">Item Types</div>
+        </div>
+    </div>
+</div>
 
+<div class="row">
     <!-- Characters Panel -->
     <div class="col-lg-8">
         <div class="d2r-card">
-            <div class="d2r-card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-people"></i> Characters</span>
-                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#newCharModal">
-                    <i class="bi bi-plus-lg"></i> New Character
-                </button>
+            <div class="d2r-card-header">
+                <i class="bi bi-people"></i> Characters
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-ghost-gold" data-bs-toggle="modal" data-bs-target="#newCharModal">
+                        <i class="bi bi-plus-lg"></i> New Character
+                    </button>
+                </div>
             </div>
 
             {% if characters %}
             <div class="row g-2">
                 {% for char in characters %}
                 <div class="col-md-6">
-                    <a href="/character/{{ char.name }}" class="text-decoration-none">
-                        <div class="inventory-item">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <strong class="quality-unique">{{ char.name }}</strong>
-                                    <div class="text-muted small">Level {{ char.level }} {{ char.class }}</div>
+                    <div class="char-card-wrap" style="position:relative">
+                        <a href="/character/{{ char.name }}" class="char-card">
+                            <div class="char-avatar">
+                                <i class="bi {{ {
+                                    'Amazon': 'bi-bullseye',
+                                    'Necromancer': 'bi-moon-stars',
+                                    'Barbarian': 'bi-shield-shaded',
+                                    'Sorceress': 'bi-stars',
+                                    'Paladin': 'bi-shield-check',
+                                    'Druid': 'bi-tree',
+                                    'Assassin': 'bi-lightning-charge'
+                                }.get(char.class, 'bi-person') }}"></i>
+                            </div>
+                            <div class="char-info">
+                                <div class="char-name">{{ char.name }}</div>
+                                <div class="char-meta">Level {{ char.level }} {{ char.class }}</div>
+                                <div class="char-stats">
+                                    <span class="char-stat"><span>{{ char.equipped_count }}</span> equipped</span>
+                                    <span class="char-stat"><span>{{ char.inventory_count }}</span> inv</span>
+                                    <span class="char-stat"><span>{{ char.stash_count }}</span> stash</span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-danger" onclick="event.preventDefault(); deleteCharacter('{{ char.name }}')">
-                                    <i class="bi bi-trash"></i>
-                                </button>
                             </div>
-                            <div class="mt-2 small">
-                                <span class="text-muted">Equipped:</span> {{ char.equipped_count }} |
-                                <span class="text-muted">Inv:</span> {{ char.inventory_count }} |
-                                <span class="text-muted">Stash:</span> {{ char.stash_count }}
-                            </div>
-                        </div>
-                    </a>
+                        </a>
+                        <button class="btn-icon danger" style="position:absolute; top:8px; right:8px; z-index:2"
+                                onclick="deleteCharacter('{{ char.name }}')">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <div class="text-center text-muted py-4">
-                <i class="bi bi-person-plus" style="font-size: 2rem;"></i>
-                <p class="mt-2">No characters yet. Create one to start tracking your gear.</p>
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="bi bi-person-plus"></i></div>
+                <div class="empty-state-text">No characters yet. Create one to start tracking your gear.</div>
+                <button class="btn btn-d2r btn-sm" data-bs-toggle="modal" data-bs-target="#newCharModal">
+                    <i class="bi bi-plus-lg"></i> Create Character
+                </button>
             </div>
             {% endif %}
         </div>
 
         <!-- Shared Stash -->
         <div class="d2r-card">
-            <div class="d2r-card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-box-seam"></i> Shared Stash</span>
-                <button class="btn btn-sm btn-outline-warning" onclick="showAddToStash('shared')">
-                    <i class="bi bi-plus-lg"></i> Add Item
-                </button>
+            <div class="d2r-card-header">
+                <i class="bi bi-archive"></i> Shared Stash
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-ghost-gold" onclick="showAddToStash('shared')">
+                        <i class="bi bi-plus-lg"></i> Add Item
+                    </button>
+                </div>
             </div>
             <ul class="nav nav-tabs stash-tabs" role="tablist">
                 <li class="nav-item">
@@ -109,34 +134,54 @@
         </div>
     </div>
 
-    <!-- Quick Actions Sidebar -->
+    <!-- Right Sidebar -->
     <div class="col-lg-4">
+        <!-- Quick Actions -->
         <div class="d2r-card">
             <div class="d2r-card-header"><i class="bi bi-lightning"></i> Quick Actions</div>
-            <div class="d-grid gap-2">
-                <a href="/analyzer" class="btn btn-outline-info btn-sm">
-                    <i class="bi bi-search"></i> Analyze Item
+            <div class="d-flex flex-column gap-1">
+                <a href="/analyzer" class="quick-action">
+                    <i class="bi bi-search-heart" style="color:var(--accent-blue)"></i>
+                    <div>
+                        <div class="qa-label">Analyze Item</div>
+                        <div class="qa-desc">Check roll quality & value</div>
+                    </div>
                 </a>
-                <a href="/prices" class="btn btn-outline-warning btn-sm">
-                    <i class="bi bi-currency-exchange"></i> Price Check
+                <a href="/prices" class="quick-action">
+                    <i class="bi bi-graph-up-arrow" style="color:var(--d2r-gold)"></i>
+                    <div>
+                        <div class="qa-label">Price Check</div>
+                        <div class="qa-desc">Current FG & HR rates</div>
+                    </div>
                 </a>
-                <a href="/trade" class="btn btn-outline-success btn-sm">
-                    <i class="bi bi-shop"></i> Create Trade Post
+                <a href="/trade" class="quick-action">
+                    <i class="bi bi-arrow-left-right" style="color:var(--accent-green)"></i>
+                    <div>
+                        <div class="qa-label">Create Trade Post</div>
+                        <div class="qa-desc">D2JSP & Traderie formats</div>
+                    </div>
                 </a>
-                <a href="/guides" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-book"></i> Build Guides
+                <a href="/guides" class="quick-action">
+                    <i class="bi bi-journal-bookmark" style="color:var(--accent-purple)"></i>
+                    <div>
+                        <div class="qa-label">Build Guides</div>
+                        <div class="qa-desc">Optimized builds & breakpoints</div>
+                    </div>
                 </a>
             </div>
         </div>
 
-        <!-- Item Tally -->
+        <!-- Item Breakdown -->
         {% if tally.by_quality %}
         <div class="d2r-card">
             <div class="d2r-card-header"><i class="bi bi-bar-chart"></i> Item Breakdown</div>
             {% for quality, count in tally.by_quality.items() %}
-            <div class="d-flex justify-content-between mb-1">
-                <span class="quality-{{ quality|lower }}">{{ quality }}</span>
-                <span class="text-muted">{{ count }}</span>
+            <div class="quality-bar-wrap">
+                <div class="quality-bar-label quality-{{ quality|lower }}">{{ quality }}</div>
+                <div class="quality-bar-track">
+                    <div class="quality-bar-fill" style="width: {{ (count / tally.total_items * 100) if tally.total_items > 0 else 0 }}%; background: var(--d2r-{{ quality|lower }}, var(--d2r-gold-dim))"></div>
+                </div>
+                <div class="quality-bar-count">{{ count }}</div>
             </div>
             {% endfor %}
         </div>
@@ -144,13 +189,13 @@
 
         <!-- Quick FG/HR Converter -->
         <div class="d2r-card">
-            <div class="d2r-card-header"><i class="bi bi-arrow-left-right"></i> FG / HR Converter</div>
+            <div class="d2r-card-header"><i class="bi bi-currency-exchange"></i> FG / HR Converter</div>
             <div class="mb-2">
-                <label class="form-label small">Forum Gold Amount</label>
+                <label class="form-label">Forum Gold Amount</label>
                 <input type="number" class="form-control form-control-sm" id="fgInput"
                        placeholder="Enter FG amount" onchange="convertFgToHr()">
             </div>
-            <div id="hrOutput" class="price-hr text-center py-2"></div>
+            <div id="hrOutput" class="converter-result price-hr"></div>
         </div>
     </div>
 </div>
@@ -158,9 +203,9 @@
 <!-- New Character Modal -->
 <div class="modal fade" id="newCharModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content bg-dark">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title quality-unique">Create Character</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-person-plus" style="color:var(--d2r-gold)"></i> Create Character</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -185,9 +230,9 @@
                     <input type="number" class="form-control" id="charLevel" value="1" min="1" max="99">
                 </div>
             </div>
-            <div class="modal-footer border-secondary">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-warning" onclick="createCharacter()">Create</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-d2r" onclick="createCharacter()">Create Character</button>
             </div>
         </div>
     </div>
@@ -196,9 +241,9 @@
 <!-- Add to Stash Modal -->
 <div class="modal fade" id="addStashModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content bg-dark">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title">Add Item to Stash</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle" style="color:var(--d2r-gold)"></i> Add Item to Stash</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -236,9 +281,9 @@
                     <input type="text" class="form-control" id="stashItemNotes" placeholder="Optional notes">
                 </div>
             </div>
-            <div class="modal-footer border-secondary">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-warning" onclick="addToStash()">Add</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-d2r" onclick="addToStash()">Add Item</button>
             </div>
         </div>
     </div>
@@ -318,17 +363,17 @@ async function loadSharedStash() {
         const container = document.getElementById(`sharedStash${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
         if (!container) continue;
         if (items.length === 0) {
-            container.innerHTML = '<div class="text-muted small">Empty</div>';
+            container.innerHTML = '<div class="text-muted small" style="padding: 1rem;">Empty tab</div>';
         } else {
             container.innerHTML = items.map(item => `
                 <div class="inventory-item">
-                    <div class="d-flex justify-content-between">
-                        <span class="quality-${(item.quality || 'normal').toLowerCase()}">${item.ethereal ? 'ETH ' : ''}${item.name}</span>
-                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromStash('${item.id}', '${tab}')">
-                            <i class="bi bi-x"></i>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="quality-${(item.quality || 'normal').toLowerCase()}">${item.ethereal ? '<span class="quality-eth">ETH</span> ' : ''}${item.name}</span>
+                        <button class="btn-icon danger" onclick="removeFromStash('${item.id}', '${tab}')">
+                            <i class="bi bi-x-lg" style="font-size:0.7rem"></i>
                         </button>
                     </div>
-                    ${item.notes ? `<div class="text-muted small">${item.notes}</div>` : ''}
+                    ${item.notes ? `<div class="text-muted small mt-1">${item.notes}</div>` : ''}
                 </div>
             `).join('');
         }
