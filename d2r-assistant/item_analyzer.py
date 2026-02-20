@@ -14,9 +14,13 @@ class ItemAnalyzer:
 
     def __init__(self, db_path=None):
         if db_path is None:
-            db_path = os.path.join(
-                os.path.dirname(__file__), "data", "item_database.json"
-            )
+            # Use bundled data dir (read-only) for item database
+            import sys
+            if getattr(sys, 'frozen', False):
+                base = sys._MEIPASS
+            else:
+                base = os.path.dirname(__file__)
+            db_path = os.path.join(base, "data", "item_database.json")
         with open(db_path, "r") as f:
             self.db = json.load(f)
 

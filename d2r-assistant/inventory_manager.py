@@ -56,9 +56,12 @@ class InventoryManager:
 
     def __init__(self, data_path=None):
         if data_path is None:
-            data_path = os.path.join(
-                os.path.dirname(__file__), "data", "inventory.json"
-            )
+            import sys
+            if getattr(sys, 'frozen', False):
+                data_dir = os.path.join(os.path.dirname(sys.executable), "d2r_data")
+            else:
+                data_dir = os.path.join(os.path.dirname(__file__), "data")
+            data_path = os.path.join(data_dir, "inventory.json")
         self.data_path = data_path
         self.data = self._load()
 

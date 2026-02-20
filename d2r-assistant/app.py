@@ -10,6 +10,9 @@ Main web application that ties together all modules:
 """
 import json
 import os
+import sys
+import webbrowser
+import threading
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_cors import CORS
 
@@ -20,7 +23,11 @@ from price_engine import PriceEngine
 from trade_integration import TradeIntegration
 from community_tools import CommunityTools
 
-app = Flask(__name__)
+# Set template and static dirs for PyInstaller bundle
+template_dir = os.path.join(Config.BASE_DIR, "templates")
+static_dir = os.path.join(Config.BASE_DIR, "static")
+
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config.from_object(Config)
 CORS(app)
 
@@ -425,4 +432,16 @@ def server_error(e):
 
 if __name__ == "__main__":
     os.makedirs(Config.DATA_DIR, exist_ok=True)
-    app.run(debug=Config.DEBUG, host="0.0.0.0", port=5000)
+
+    port = 5000
+    is_frozen = getattr(sys, 'frozen', False)
+
+    if is_frozen:
+        # When running as exe, auto-open browser after a short delay
+        def open_browser():
+            webbrowser.open(f"http://localhost:{port}")
+        threading.Timer(1.5, open_browser).start()
+        print(f"D2R Inventory Assistant starting on http://localhost:{port}")
+        print("Close this window to stop the server.")
+
+    app.run(debug=Config.DEBUG, host="0.0.0.0", port=port, use_reloader=not is_frozen)

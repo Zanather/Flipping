@@ -2,14 +2,33 @@
 D2R Inventory Assistant - Configuration
 """
 import os
-from dotenv import load_dotenv
+import sys
 
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not required for bundled exe
+
+
+def _get_base_dir():
+    """Get the base directory for bundled resources (read-only)."""
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+def _get_user_data_dir():
+    """Get the writable data directory for user files (inventory, trade history, cache).
+    When running as a bundled exe, stores data next to the executable so it persists."""
+    if getattr(sys, 'frozen', False):
+        return os.path.join(os.path.dirname(sys.executable), "d2r_data")
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "d2r-assistant-dev-key")
-    DEBUG = os.getenv("DEBUG", "true").lower() == "true"
+    DEBUG = os.getenv("DEBUG", "false" if getattr(sys, 'frozen', False) else "true").lower() == "true"
 
     # D2JSP Integration
     D2JSP_USERNAME = os.getenv("D2JSP_USERNAME", "")
@@ -18,11 +37,16 @@ class Config:
     # Traderie Integration
     TRADERIE_API_KEY = os.getenv("TRADERIE_API_KEY", "")
 
-    # Data paths
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    DATA_DIR = os.path.join(BASE_DIR, "data")
+    # Base directory for bundled resources (templates, static, item_database)
+    BASE_DIR = _get_base_dir()
+
+    # Writable data directory for user files
+    DATA_DIR = _get_user_data_dir()
     INVENTORY_FILE = os.path.join(DATA_DIR, "inventory.json")
     PRICE_CACHE_FILE = os.path.join(DATA_DIR, "price_cache.json")
+
+    # Read-only bundled data (item database)
+    BUNDLED_DATA_DIR = os.path.join(BASE_DIR, "data")
 
     # Price cache duration in seconds (30 minutes)
     PRICE_CACHE_TTL = 1800
