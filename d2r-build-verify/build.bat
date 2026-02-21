@@ -22,6 +22,7 @@ setlocal enabledelayedexpansion
 set "SCRIPT_DIR=%~dp0"
 set "D2R_STUFF_DIR=%SCRIPT_DIR%d2r-stuff"
 set "BUILD_DIR=%SCRIPT_DIR%build"
+set "LOG_FILE=%SCRIPT_DIR%build_log.txt"
 set "CLONE=1"
 set "CLEAN=0"
 
@@ -36,10 +37,16 @@ shift
 goto :parse_args
 :args_done
 
+:: Start logging to file
+echo d2r-stuff Build Verification - %DATE% %TIME% > "%LOG_FILE%"
+echo. >> "%LOG_FILE%"
+
 echo.
 echo ================================================================
 echo  d2r-stuff Build Verification
 echo ================================================================
+echo.
+echo  (Output is also saved to build_log.txt)
 echo.
 
 :: -----------------------------------------------------------------------
@@ -51,7 +58,8 @@ set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if not exist "%VSWHERE%" (
     echo ERROR: vswhere.exe not found. Install Visual Studio 2022.
     echo Download: https://visualstudio.microsoft.com/downloads/
-    exit /b 1
+    echo [FAIL] vswhere.exe not found >> "%LOG_FILE%"
+    goto :done_fail
 )
 
 for /f "usebackq tokens=*" %%i in (`"%VSWHERE%" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do (
@@ -61,16 +69,19 @@ for /f "usebackq tokens=*" %%i in (`"%VSWHERE%" -latest -products * -requires Mi
 if not defined VS_PATH (
     echo ERROR: Visual Studio with C++ tools not found.
     echo Install "Desktop development with C++" workload.
-    exit /b 1
+    echo [FAIL] VS C++ tools not found >> "%LOG_FILE%"
+    goto :done_fail
 )
 
 echo   Found: %VS_PATH%
+echo [OK] VS2022: %VS_PATH% >> "%LOG_FILE%"
 
 :: Initialize VS developer environment
 call "%VS_PATH%\VC\Auxiliary\Build\vcvars64.bat" >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Failed to initialize VS2022 x64 environment.
-    exit /b 1
+    echo [FAIL] vcvars64.bat failed >> "%LOG_FILE%"
+    goto :done_fail
 )
 echo   x64 environment initialized.
 
@@ -84,11 +95,13 @@ where cmake >nul 2>&1
 if errorlevel 1 (
     echo ERROR: CMake not found in PATH.
     echo Install CMake or ensure VS2022 CMake is in PATH.
-    exit /b 1
+    echo [FAIL] CMake not found >> "%LOG_FILE%"
+    goto :done_fail
 )
 
 for /f "tokens=3" %%v in ('cmake --version 2^>^&1 ^| findstr /i "version"') do (
     echo   CMake version: %%v
+    echo [OK] CMake %%v >> "%LOG_FILE%"
 )
 
 :: -----------------------------------------------------------------------
@@ -108,7 +121,9 @@ if "%CLONE%"=="1" (
         git clone https://github.com/ejt1/d2r-stuff.git "%D2R_STUFF_DIR%"
         if errorlevel 1 (
             echo ERROR: Failed to clone d2r-stuff repository.
-            exit /b 1
+            echo   Check your internet connection and try again.
+            echo [FAIL] git clone failed >> "%LOG_FILE%"
+            goto :done_fail
         )
     )
 ) else (
@@ -118,10 +133,12 @@ if "%CLONE%"=="1" (
 if not exist "%D2R_STUFF_DIR%\blz\src\blz\d2r.h" (
     echo ERROR: d2r-stuff not found at %D2R_STUFF_DIR%
     echo   Clone it manually: git clone https://github.com/ejt1/d2r-stuff.git "%D2R_STUFF_DIR%"
-    exit /b 1
+    echo [FAIL] d2r-stuff not found >> "%LOG_FILE%"
+    goto :done_fail
 )
 
 echo   Source found at: %D2R_STUFF_DIR%
+echo [OK] d2r-stuff found >> "%LOG_FILE%"
 
 :: Count source files
 set "CC_COUNT=0"
@@ -161,10 +178,12 @@ if errorlevel 1 (
     echo  FAIL: CMake configuration failed
     echo ================================================================
     echo  Check the error output above for details.
-    exit /b 1
+    echo [FAIL] CMake configure failed >> "%LOG_FILE%"
+    goto :done_fail
 )
 
 echo   Configuration successful.
+echo [OK] CMake configured >> "%LOG_FILE%"
 
 :: -----------------------------------------------------------------------
 :: Step 5: Build
@@ -183,9 +202,11 @@ cmake --build "%BUILD_DIR%" --target d2r_header_check --config Release 2>&1
 if errorlevel 1 (
     echo   RESULT: FAIL - Headers contain parse errors
     set "HEADER_PASS=0"
+    echo [FAIL] Header check >> "%LOG_FILE%"
 ) else (
     echo   RESULT: PASS - All headers parse correctly
     set "HEADER_PASS=1"
+    echo [PASS] Header check >> "%LOG_FILE%"
 )
 
 :: Build struct check
@@ -195,9 +216,11 @@ cmake --build "%BUILD_DIR%" --target d2r_struct_check --config Release 2>&1
 if errorlevel 1 (
     echo   RESULT: FAIL - Struct size assertions failed
     set "STRUCT_PASS=0"
+    echo [FAIL] Struct check >> "%LOG_FILE%"
 ) else (
     echo   RESULT: PASS - All struct sizes match expected values
     set "STRUCT_PASS=1"
+    echo [PASS] Struct check >> "%LOG_FILE%"
 )
 
 :: Build full source
@@ -207,9 +230,11 @@ cmake --build "%BUILD_DIR%" --target d2r_verify --config Release 2>&1
 if errorlevel 1 (
     echo   RESULT: FAIL - Source compilation errors
     set "SOURCE_PASS=0"
+    echo [FAIL] Source compilation >> "%LOG_FILE%"
 ) else (
     echo   RESULT: PASS - All source files compile successfully
     set "SOURCE_PASS=1"
+    echo [PASS] Source compilation >> "%LOG_FILE%"
 )
 
 :: -----------------------------------------------------------------------
@@ -266,8 +291,25 @@ if "%TOTAL_PASS%"=="3" (
 echo.
 echo ================================================================
 echo.
+echo OVERALL: %TOTAL_PASS%/3 passed >> "%LOG_FILE%"
 
+echo.
+echo Press any key to close this window...
+pause >nul
 if "%TOTAL_PASS%"=="3" (exit /b 0) else (exit /b 1)
+
+:done_fail
+echo.
+echo ================================================================
+echo  BUILD FAILED - See errors above
+echo ================================================================
+echo.
+echo  If the window closed too fast before, the log is saved to:
+echo    %LOG_FILE%
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
 
 :show_help
 echo.
@@ -295,4 +337,6 @@ echo      - d2r_struct_check  : Verifies struct sizes via static_assert
 echo      - d2r_verify        : Compiles all .cc/.cpp source files
 echo   5. Report pass/fail for each target
 echo.
+echo Press any key to close this window...
+pause >nul
 exit /b 0
