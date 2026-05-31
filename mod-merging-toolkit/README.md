@@ -107,7 +107,11 @@ Pure-stdlib Python 3. Hashes every file in each tree and reports:
 - **Overwrite conflicts** — same relative path, both mods changed it vs vanilla.
 - **Animation ID collisions** — `aXXX_YYYYYY.hkx` present in both, differing
   content (the classic "both mods used the same free ID" break).
-- **TAE conflicts** — TimeActEvents files both mods edited.
+- **TAE conflicts** — TimeActEvents files both mods edited, **plus a
+  per-animation breakdown**: when given vanilla, it parses each conflicting
+  `.tae.xml` and reports which *animations* each mod changed. If the two mods
+  edited *different* animations inside the same file, it's flagged mergeable
+  (combine both sets); only animations both mods edited are true conflicts.
 - **Auto-resolvable** — shared path, but only one mod differs from vanilla.
 - **Clean additions** — files one mod adds that the other lacks.
 
@@ -132,8 +136,9 @@ between sessions, this keeps the agent from working blind on a fresh clone.
 
 ## Roadmap
 
-- TAE-level parsing in `conflict_scan` (which animation/event entries collide,
-  not just which files).
+The four planned pieces are done: param delta analysis, the slash skills, the
+SessionStart hook, and TAE per-animation parsing. Possible future work: full
+TAE *event*-level diffing, and writing a merged `.tae.xml` for mergeable cases.
 
 ## Sources
 
