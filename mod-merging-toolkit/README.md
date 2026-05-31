@@ -13,7 +13,7 @@ collides so you only hand-merge what actually conflicts.
 
 | Track | What conflicts | Best tool | Helper here |
 |-------|----------------|-----------|-------------|
-| **Params** (`regulation.bin`) | Same param row edited by 2 mods | Smithbox **Delta Param Patcher** | _(planned)_ delta report |
+| **Params** (`regulation.bin`) | Same param row edited by 2 mods | Smithbox **Delta Param Patcher** | `scripts/param_delta.py` |
 | **Files** (anibnd / chrbnd / C0000) | Same file or animation ID in 2 mods | WitchyBND + hand-merge | `scripts/conflict_scan.py` |
 
 ---
@@ -34,6 +34,33 @@ Rule of thumb:
 
 Keep mods in disjoint ID ranges wherever a mod *adds* rows — that's what makes
 additions clean. See sources at the bottom for full Smithbox merge tutorials.
+
+### param_delta.py — field-level delta analysis
+
+Smithbox's Delta Param Patcher merges great in the GUI but gives you no
+written, diffable record of *what* two mods fight over. This script does. Export
+the same param from vanilla, mod A, and mod B to CSV, then:
+
+```text
+python scripts/param_delta.py --vanilla v.csv --a A.csv --b B.csv --out merged.csv
+```
+
+It works at the **field** level, in the Delta-Patcher spirit (everything is a
+delta vs vanilla):
+
+- **Auto-merged** — A and B edit *different* fields of the same row. Not a
+  conflict; the script combines both deltas onto the vanilla base.
+- **Single-mod edits / clean additions** — only one mod touched it; applied as-is.
+- **Field conflicts** — both mods set the *same* field to *different* values.
+  The only thing you actually have to resolve by hand.
+- **Add collisions** — both mods add the same new row ID with different data
+  (re-ID one, or pick a winner).
+
+`--out` writes a merged CSV with every clean/auto-mergeable change applied;
+conflicting rows are kept at their **vanilla** value (never silently guessed)
+so you resolve just those in Smithbox. Point `--a/--b/--vanilla` at directories
+of per-param CSVs (with `--out-dir`) to process a whole regulation at once.
+Non-zero exit when real conflicts exist.
 
 ## Track 2 — WitchyBND files & C0000 merges
 
@@ -89,10 +116,11 @@ skill or CI check. Run `python scripts/conflict_scan.py -h` for flags.
 
 ## Roadmap
 
-- `param_delta.py` — read two regulation CSV/delta exports, report row-level
-  collisions in the Delta-Patcher spirit (delta-vs-vanilla, not full import).
-- Custom Claude Code skills: `/unpack`, `/conflict-scan`, `/param-merge`.
+- Custom Claude Code skills: `/unpack`, `/conflict-scan`, `/param-merge`
+  (wrappers so you run the whole flow by slash command). **Next.**
 - SessionStart hook to verify WitchyBND + Python are on PATH.
+- TAE-level parsing in `conflict_scan` (which animation/event entries collide,
+  not just which files).
 
 ## Sources
 
