@@ -123,9 +123,15 @@ typing a command instead of remembering CLI args:
 - **`/conflict-scan`** — run the C0000/anibnd collision scan (Track 2).
 - **`/param-merge`** — run the regulation param delta analysis (Track 1).
 
+## SessionStart hook
+
+`.claude/settings.json` wires a SessionStart hook to `.claude/hooks/check-tools.sh`,
+which runs on every session start and reports whether `python3`, `witchybnd`,
+and the toolkit scripts are present. Because the web/remote container is wiped
+between sessions, this keeps the agent from working blind on a fresh clone.
+
 ## Roadmap
 
-- SessionStart hook to verify WitchyBND + Python are on PATH.
 - TAE-level parsing in `conflict_scan` (which animation/event entries collide,
   not just which files).
 
