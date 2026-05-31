@@ -23,13 +23,13 @@ filenames across the three.
    Decide single-param vs directory mode from whether they point at files or dirs.
 
 2. Run (single param):
-   ```
+   ```bash
    python3 mod-merging-toolkit/scripts/param_delta.py \
        --vanilla "<V>" --a "<A>" --b "<B>" \
        --out /tmp/merged.csv --json /tmp/param_report.json
    ```
    Or whole regulation (directories):
-   ```
+   ```bash
    python3 mod-merging-toolkit/scripts/param_delta.py \
        --vanilla "<V>/" --a "<A>/" --b "<B>/" --out-dir /tmp/merged/
    ```

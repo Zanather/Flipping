@@ -30,6 +30,7 @@ import argparse
 import csv
 import io
 import json
+import shutil
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -217,26 +218,63 @@ def main(argv: list[str]) -> int:
     args = ap.parse_args(argv)
 
     results: list[ParamResult] = []
+    carried: dict[str, list[str]] = {"a": [], "b": []}
     if args.a.is_dir():
+        # Directory mode: validate the combination so we fail with a clear CLI
+        # error instead of a traceback from load_param on a bad path.
         if not args.b.is_dir():
             ap.error("--a is a dir but --b is not")
+        if args.vanilla and not args.vanilla.is_dir():
+            ap.error("--vanilla must be a directory in directory mode")
+        if args.out:
+            ap.error("use --out-dir (not --out) in directory mode")
         if args.out_dir:
             args.out_dir.mkdir(parents=True, exist_ok=True)
-        names = sorted({p.name for p in args.a.glob("*.csv")} &
-                       {p.name for p in args.b.glob("*.csv")})
-        if not names:
-            ap.error("no matching *.csv filenames between --a and --b dirs")
+        a_names = {p.name for p in args.a.glob("*.csv")}
+        b_names = {p.name for p in args.b.glob("*.csv")}
+        names = sorted(a_names & b_names)
+        only_a = sorted(a_names - b_names)
+        only_b = sorted(b_names - a_names)
+        if not names and not only_a and not only_b:
+            ap.error("no *.csv files found in --a / --b dirs")
         for nm in names:
             vp = (args.vanilla / nm) if args.vanilla else None
             out = (args.out_dir / nm) if args.out_dir else None
             results.append(resolve_pair(nm, vp, args.a / nm, args.b / nm, out))
+        # Params only one mod exported aren't conflicts, but must NOT be dropped
+        # silently (that would hide real changes). Carry them through and report.
+        for nm in only_a:
+            carried["a"].append(nm)
+            if args.out_dir:
+                shutil.copyfile(args.a / nm, args.out_dir / nm)
+        for nm in only_b:
+            carried["b"].append(nm)
+            if args.out_dir:
+                shutil.copyfile(args.b / nm, args.out_dir / nm)
     else:
+        # Single-param mode: reject directory inputs and missing files up front.
+        if args.b.is_dir():
+            ap.error("--a is a file but --b is a directory")
+        if args.vanilla and args.vanilla.is_dir():
+            ap.error("--vanilla must be a CSV file in single-param mode")
+        if args.out_dir:
+            ap.error("use --out (not --out-dir) in single-param mode")
+        for label, p in (("--a", args.a), ("--b", args.b), ("--vanilla", args.vanilla)):
+            if p and not p.is_file():
+                ap.error(f"{label} is not a file: {p}")
         name = args.a.stem
         results.append(resolve_pair(name, args.vanilla, args.a, args.b, args.out))
 
     total_conflicts = sum(r.conflict_count for r in results)
     print(f"\n{'='*56}")
     print(f"Params analyzed: {len(results)}   Total conflicts: {total_conflicts}")
+    if carried["a"] or carried["b"]:
+        print("NOTE: params only one mod exported — carried through as-is, "
+              "not merged:")
+        if carried["a"]:
+            print(f"  only in --a: {', '.join(carried['a'])}")
+        if carried["b"]:
+            print(f"  only in --b: {', '.join(carried['b'])}")
     for r in results:
         print_result(r)
 

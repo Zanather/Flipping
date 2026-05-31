@@ -18,7 +18,7 @@ A practical run-through. Two tracks; most merges need both.
    (For a whole regulation, export each param into per-source folders.)
 
 2. **Analyze + auto-merge:**
-   ```
+   ```bash
    python3 mod-merging-toolkit/scripts/param_delta.py \
        --vanilla vanilla/EquipParamWeapon.csv \
        --a modA/EquipParamWeapon.csv \
@@ -44,12 +44,12 @@ A practical run-through. Two tracks; most merges need both.
 ## Track B — C0000 / anibnd (files & animations)
 
 1. **Unpack all three** with WitchyBND (vanilla, mod A, mod B):
-   ```
+   ```bash
    witchybnd c0000.anibnd.dcx      # produces c0000-anibnd/ next to it
    ```
 
 2. **Scan for collisions:**
-   ```
+   ```bash
    python3 mod-merging-toolkit/scripts/conflict_scan.py \
        --a   modA/c0000-anibnd \
        --b   modB/c0000-anibnd \

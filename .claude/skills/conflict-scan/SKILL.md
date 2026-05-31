@@ -19,7 +19,7 @@ two WitchyBND-unpacked mod folders.
    If the user hasn't unpacked yet, point them at the `/unpack` skill first.
 
 2. Run:
-   ```
+   ```bash
    python3 mod-merging-toolkit/scripts/conflict_scan.py \
        --a "<A>" --b "<B>" --vanilla "<VANILLA>" --json /tmp/conflict_report.json
    ```

@@ -25,7 +25,7 @@ locally, and give them the exact commands to run there instead of failing.
    unpack around as the base.
 
 3. Run WitchyBND on each target:
-   ```
+   ```bash
    witchybnd "<path-to-file-or-folder>"
    ```
    WitchyBND unpacks in place, producing a sibling folder plus a

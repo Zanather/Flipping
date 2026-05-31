@@ -61,6 +61,16 @@ def parse_tae_animations(path: Path) -> dict[str, str] | None:
     a child ID element. Returns None if the file can't be parsed as TAE XML so
     callers can fall back to file-level comparison.
     """
+    # Harden against entity-expansion ("billion laughs"): these attacks require
+    # a DTD / entity declaration, which legitimate WitchyBND TAE XML never has.
+    # Reject any such input up front so we stay safe even on older Expat builds,
+    # without taking on the unmaintained defusedxml dependency (stdlib-only).
+    try:
+        head = path.read_bytes()[:4096].lower()
+    except OSError:
+        return None
+    if b"<!doctype" in head or b"<!entity" in head:
+        return None
     try:
         root = ET.parse(path).getroot()
     except ET.ParseError:
