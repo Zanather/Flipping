@@ -114,10 +114,17 @@ Pure-stdlib Python 3. Hashes every file in each tree and reports:
 Exit code is non-zero when real conflicts exist, so it drops cleanly into a
 skill or CI check. Run `python scripts/conflict_scan.py -h` for flags.
 
+## Slash-command skills
+
+Project skills in `.claude/skills/` wrap the scripts so you run the flow by
+typing a command instead of remembering CLI args:
+
+- **`/unpack`** — drive WitchyBND to unpack `.dcx/.anibnd/.tae/...` (and how to repack).
+- **`/conflict-scan`** — run the C0000/anibnd collision scan (Track 2).
+- **`/param-merge`** — run the regulation param delta analysis (Track 1).
+
 ## Roadmap
 
-- Custom Claude Code skills: `/unpack`, `/conflict-scan`, `/param-merge`
-  (wrappers so you run the whole flow by slash command). **Next.**
 - SessionStart hook to verify WitchyBND + Python are on PATH.
 - TAE-level parsing in `conflict_scan` (which animation/event entries collide,
   not just which files).
