@@ -225,10 +225,10 @@ stay at vanilla (never guessed). Supports single-param or whole-regulation
 
 ```bash
 # Single param
-python3 param_delta.py --vanilla v.csv --a A.csv --b B.csv --out merged.csv
+python3 scripts/param_delta.py --vanilla v.csv --a A.csv --b B.csv --out merged.csv
 
 # Whole regulation (dirs of per-param CSVs)
-python3 param_delta.py --vanilla van/ --a A/ --b B/ --out-dir merged/
+python3 scripts/param_delta.py --vanilla van/ --a A/ --b B/ --out-dir merged/
 ```
 
 ### conflict_scan.py
@@ -238,7 +238,7 @@ animations each mod changed), overwrite conflicts, auto-resolvable diffs, and
 clean additions. Pure Python stdlib.
 
 ```bash
-python3 conflict_scan.py \
+python3 scripts/conflict_scan.py \
     --a modA/c0000-anibnd --b modB/c0000-anibnd --vanilla vanilla/c0000-anibnd
 ```
 
