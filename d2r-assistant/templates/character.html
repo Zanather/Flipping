@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+{% block title %}D2R Assistant - {{ character.name }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb-nav">
+    <a href="/"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+    <span class="separator">/</span>
+    <span style="color:var(--d2r-gold)">{{ character.name }}</span>
+</div>
+
+<!-- Character Header -->
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-3">
+        <div class="char-avatar" style="width:52px;height:52px;font-size:1.5rem;">
+            <i class="bi {{ {
+                'Amazon': 'bi-bullseye',
+                'Necromancer': 'bi-moon-stars',
+                'Barbarian': 'bi-shield-shaded',
+                'Sorceress': 'bi-stars',
+                'Paladin': 'bi-shield-check',
+                'Druid': 'bi-tree',
+                'Assassin': 'bi-lightning-charge'
+            }.get(character.class, 'bi-person') }}"></i>
+        </div>
+        <div>
+            <h1 class="page-title" style="color:var(--d2r-unique)">{{ character.name }}</h1>
+            <p class="page-subtitle mb-0">Level {{ character.level }} {{ character.class }}</p>
+        </div>
+    </div>
+    <button class="btn btn-sm btn-ghost-gold" data-bs-toggle="modal" data-bs-target="#editLevelModal">
+        <i class="bi bi-pencil"></i> Edit Level
+    </button>
+</div>
+
+<div class="row">
+    <!-- Equipped Gear -->
+    <div class="col-lg-5">
+        <div class="d2r-card">
+            <div class="d2r-card-header"><i class="bi bi-shield"></i> Equipped Gear</div>
+            <div class="gear-grid">
+                {% set slots = ['helm', 'amulet', 'weapon_swap', 'body_armor', 'ring1', 'ring2', 'weapon', 'shield', 'belt', 'gloves', 'boots', 'shield_swap'] %}
+                {% for slot in slots %}
+                <div class="gear-slot {% if character.equipped[slot] %}filled{% endif %}"
+                     onclick="showEquipModal('{{ slot }}')" title="{{ slot | replace('_', ' ') | title }}">
+                    <div class="gear-slot-label">{{ slot | replace('_', ' ') }}</div>
+                    {% if character.equipped[slot] %}
+                    <div class="gear-slot-item">{{ character.equipped[slot].name }}</div>
+                    {% else %}
+                    <div style="color:var(--text-muted); font-size:0.75rem;">empty</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory -->
+    <div class="col-lg-7">
+        <div class="d2r-card">
+            <div class="d2r-card-header">
+                <i class="bi bi-backpack"></i> Inventory ({{ character.inventory|length }})
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-ghost-gold" onclick="showAddItemModal('inventory')">
+                        <i class="bi bi-plus-lg"></i> Add
+                    </button>
+                </div>
+            </div>
+            <div class="inventory-grid" id="inventoryGrid">
+                {% for item in character.inventory %}
+                <div class="inventory-item fade-in">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="quality-{{ (item.quality or 'normal')|lower }}">
+                            {% if item.ethereal %}<span class="quality-eth">ETH</span> {% endif %}{{ item.name }}
+                        </span>
+                        <div class="d-flex gap-1">
+                            <button class="btn-icon" onclick="analyzeItem('{{ item.name }}')" title="Analyze">
+                                <i class="bi bi-search" style="font-size:0.75rem"></i>
+                            </button>
+                            <button class="btn-icon danger" onclick="removeFromInventory('{{ item.id }}')" title="Remove">
+                                <i class="bi bi-trash3" style="font-size:0.75rem"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% if item.mods %}
+                    <div class="mt-1" style="font-size:0.78rem; color:var(--text-secondary);">
+                        {% for mod, val in item.mods.items() %}
+                        <div>{{ mod }}: {{ val }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% if not character.inventory %}
+                <div class="empty-state" style="padding:1.5rem;">
+                    <div class="empty-state-icon" style="font-size:1.5rem;"><i class="bi bi-backpack"></i></div>
+                    <div class="empty-state-text" style="font-size:0.82rem;">No items in inventory</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Personal Stash -->
+        <div class="d2r-card">
+            <div class="d2r-card-header">
+                <i class="bi bi-archive"></i> Personal Stash
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-ghost-gold" onclick="showAddItemModal('stash')">
+                        <i class="bi bi-plus-lg"></i> Add
+                    </button>
+                </div>
+            </div>
+            <ul class="nav nav-tabs stash-tabs" role="tablist">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pTab1">Tab 1</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#pTab2">Tab 2</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#pTab3">Tab 3</button></li>
+            </ul>
+            <div class="tab-content pt-3">
+                {% for tab in ['tab1', 'tab2', 'tab3'] %}
+                <div class="tab-pane fade {% if tab == 'tab1' %}show active{% endif %}" id="pTab{{ loop.index }}">
+                    <div class="inventory-grid">
+                        {% for item in character.personal_stash.tabs[tab] %}
+                        <div class="inventory-item">
+                            <span class="quality-{{ (item.quality or 'normal')|lower }}">{{ item.name }}</span>
+                        </div>
+                        {% endfor %}
+                        {% if not character.personal_stash.tabs[tab] %}
+                        <div style="color:var(--text-muted); font-size:0.82rem; padding:0.5rem;">Empty</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Equip Item Modal -->
+<div class="modal fade" id="equipModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-shield" style="color:var(--d2r-gold)"></i> Equip - <span id="equipSlotLabel"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="equipSlot">
+                <div class="mb-3">
+                    <label class="form-label">Item Name</label>
+                    <input type="text" class="form-control" id="equipItemName" placeholder="e.g. Shako, Enigma">
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Quality</label>
+                        <select class="form-select" id="equipItemQuality">
+                            <option value="Unique">Unique</option>
+                            <option value="Runeword">Runeword</option>
+                            <option value="Set">Set</option>
+                            <option value="Rare">Rare</option>
+                            <option value="Magic">Magic</option>
+                            <option value="Normal">Normal</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Sockets</label>
+                        <input type="number" class="form-control" id="equipItemSockets" min="0" max="6" value="0">
+                    </div>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="equipItemEth">
+                    <label class="form-check-label">Ethereal</label>
+                </div>
+                <div id="equipModsContainer">
+                    <label class="form-label">Modifiers <button class="btn btn-sm btn-ghost-gold" onclick="addModInput('equip')">+ Add Mod</button></label>
+                    <div id="equipModInputs"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger btn-sm" id="unequipBtn" onclick="unequipItem()" style="display:none">Unequip</button>
+                <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-d2r" onclick="equipItem()">Equip</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle" style="color:var(--d2r-gold)"></i> Add Item</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="addItemTarget">
+                <div class="mb-3">
+                    <label class="form-label">Item Name</label>
+                    <input type="text" class="form-control" id="addItemName">
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Quality</label>
+                        <select class="form-select" id="addItemQuality">
+                            <option value="Unique">Unique</option>
+                            <option value="Runeword">Runeword</option>
+                            <option value="Set">Set</option>
+                            <option value="Rare">Rare</option>
+                            <option value="Magic">Magic</option>
+                            <option value="Normal">Normal</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Sockets</label>
+                        <input type="number" class="form-control" id="addItemSockets" min="0" max="6" value="0">
+                    </div>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="addItemEth">
+                    <label class="form-check-label">Ethereal</label>
+                </div>
+                <div id="addModsContainer">
+                    <label class="form-label">Modifiers <button class="btn btn-sm btn-ghost-gold" onclick="addModInput('add')">+ Add Mod</button></label>
+                    <div id="addModInputs"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-d2r" onclick="addItem()">Add Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Level Modal -->
+<div class="modal fade" id="editLevelModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Level</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="number" class="form-control" id="newLevel" value="{{ character.level }}" min="1" max="99">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-d2r" onclick="updateLevel()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const charName = '{{ character.name }}';
+let modCounter = 0;
+
+function showEquipModal(slot) {
+    document.getElementById('equipSlot').value = slot;
+    document.getElementById('equipSlotLabel').textContent = slot.replace('_', ' ');
+    document.getElementById('equipModInputs').innerHTML = '';
+    document.getElementById('equipItemName').value = '';
+
+    const equipped = {{ character.equipped | tojson }};
+    if (equipped[slot]) {
+        document.getElementById('equipItemName').value = equipped[slot].name || '';
+        document.getElementById('equipItemQuality').value = equipped[slot].quality || 'Unique';
+        document.getElementById('equipItemEth').checked = equipped[slot].ethereal || false;
+        document.getElementById('equipItemSockets').value = equipped[slot].sockets || 0;
+        document.getElementById('unequipBtn').style.display = 'block';
+
+        if (equipped[slot].mods) {
+            for (const [k, v] of Object.entries(equipped[slot].mods)) {
+                addModInput('equip', k, v);
+            }
+        }
+    } else {
+        document.getElementById('unequipBtn').style.display = 'none';
+    }
+
+    new bootstrap.Modal(document.getElementById('equipModal')).show();
+}
+
+function addModInput(prefix, name, value) {
+    const id = modCounter++;
+    const container = document.getElementById(`${prefix}ModInputs`);
+    const row = document.createElement('div');
+    row.className = 'mod-input-row';
+    row.id = `mod-${id}`;
+    row.innerHTML = `
+        <input type="text" class="form-control form-control-sm" placeholder="Mod name" value="${name || ''}">
+        <input type="number" class="form-control form-control-sm" style="max-width:80px" placeholder="Value" value="${value || ''}">
+        <button class="btn-icon danger" style="width:28px;height:28px;" onclick="document.getElementById('mod-${id}').remove()">
+            <i class="bi bi-x" style="font-size:0.8rem"></i>
+        </button>
+    `;
+    container.appendChild(row);
+}
+
+function getModsFromInputs(prefix) {
+    const mods = {};
+    const rows = document.getElementById(`${prefix}ModInputs`).children;
+    for (const row of rows) {
+        const inputs = row.querySelectorAll('input');
+        if (inputs[0].value && inputs[1].value) {
+            mods[inputs[0].value] = parseFloat(inputs[1].value);
+        }
+    }
+    return mods;
+}
+
+async function equipItem() {
+    const slot = document.getElementById('equipSlot').value;
+    const item = {
+        name: document.getElementById('equipItemName').value,
+        quality: document.getElementById('equipItemQuality').value,
+        ethereal: document.getElementById('equipItemEth').checked,
+        sockets: parseInt(document.getElementById('equipItemSockets').value),
+        mods: getModsFromInputs('equip'),
+    };
+
+    const res = await fetch(`/api/characters/${charName}/equip`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({slot, item})
+    });
+    const data = await res.json();
+    if (data.success) {
+        showToast('Item equipped!', 'success');
+        setTimeout(() => location.reload(), 500);
+    }
+}
+
+async function unequipItem() {
+    const slot = document.getElementById('equipSlot').value;
+    await fetch(`/api/characters/${charName}/unequip/${slot}`, {method: 'POST'});
+    showToast('Item unequipped.', 'success');
+    setTimeout(() => location.reload(), 500);
+}
+
+function showAddItemModal(target) {
+    document.getElementById('addItemTarget').value = target;
+    document.getElementById('addModInputs').innerHTML = '';
+    document.getElementById('addItemName').value = '';
+    new bootstrap.Modal(document.getElementById('addItemModal')).show();
+}
+
+async function addItem() {
+    const target = document.getElementById('addItemTarget').value;
+    const item = {
+        name: document.getElementById('addItemName').value,
+        quality: document.getElementById('addItemQuality').value,
+        ethereal: document.getElementById('addItemEth').checked,
+        sockets: parseInt(document.getElementById('addItemSockets').value),
+        mods: getModsFromInputs('add'),
+    };
+
+    let url;
+    if (target === 'inventory') {
+        url = `/api/characters/${charName}/inventory`;
+        await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(item)
+        });
+    } else {
+        url = '/api/stash';
+        await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({item, stash_type: 'personal', tab: 'tab1', character: charName})
+        });
+    }
+
+    showToast('Item added!', 'success');
+    setTimeout(() => location.reload(), 500);
+}
+
+async function removeFromInventory(itemId) {
+    await fetch(`/api/characters/${charName}/inventory/${itemId}`, {method: 'DELETE'});
+    showToast('Item removed.', 'success');
+    setTimeout(() => location.reload(), 500);
+}
+
+function analyzeItem(name) {
+    window.location.href = `/analyzer?item=${encodeURIComponent(name)}`;
+}
+
+async function updateLevel() {
+    const level = parseInt(document.getElementById('newLevel').value);
+    await fetch(`/api/characters/${charName}/level`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({level})
+    });
+    location.reload();
+}
+</script>
+{% endblock %}
